@@ -1,0 +1,26 @@
+function handles = LoadSession(handles)
+
+[file,path] = uigetfile('*.mat','Load a saved session...');
+
+if ~ischar(file) && file==0
+    % User has cancelled
+    % Do nothing and...
+    return;
+end
+
+
+try
+    load(strcat(path, file), 'Session_handles');
+catch
+    % Warn about invalid mat files and return
+    warndlg('This is not a valid session file. Please try another.', 'Invalid files');
+    return;
+end
+
+fNames = fieldnames(Session_handles);
+nFields = length(fNames);
+
+for ii = 1:nFields
+    handles.(fNames{ii}) = Session_handles.(fNames{ii});
+end
+
