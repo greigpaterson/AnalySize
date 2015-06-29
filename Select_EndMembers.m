@@ -133,6 +133,7 @@ set(get(handles.Var_Axes, 'Title'), 'String', 'End Member Variance', 'FontUnits'
 plot(handles.Angle_Axes, handles.Mean_Angle, '-ok', 'LineWidth', 2)
 hold(handles.Angle_Axes, 'on')
 plot(handles.Angle_Axes, 0, 0, '-r')
+plot(handles.Angle_Axes, 0, 0, '-xb', 'MarkerEdgeColor', [1,0,0])
 hold(handles.Angle_Axes, 'off')
 Plot_BoxWhisker(handles.Angle_Axes, handles.Spec_Angle)
 
