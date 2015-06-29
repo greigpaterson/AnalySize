@@ -58,8 +58,7 @@ handles.output = hObject;
 dontOpen = false;
 DataTransfer = find(strcmp(varargin, 'DataTransfer'));
 if (isempty(DataTransfer)) ...
-        || (length(varargin) <= DataTransfer)...
-        || (~ishandle(varargin{mainGuiInput+1}))
+        || (length(varargin) <= DataTransfer)
     dontOpen = true;
 else
     DataTransfer = varargin{DataTransfer+1};
