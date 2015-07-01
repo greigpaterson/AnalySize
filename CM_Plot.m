@@ -237,9 +237,9 @@ if ~ischar(file) && file==0
     return;
 end
 
-tmpFig=figure('Visible', 'off', 'Units', 'Pixels');
+tmpFig=figure('Visible', 'off', 'Units', 'Centimeters');
 oldPos=get(tmpFig, 'Position');
-set(tmpFig, 'Position', [oldPos(1), oldPos(2), 400, 400]);
+set(tmpFig, 'Position', [oldPos(1), oldPos(2), 7.5, 7.5]);
 
 newAxes=copyobj(handles.CM_Axes, tmpFig);
 axis square
@@ -250,12 +250,10 @@ set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);% set(get(newAxes, 'Children'), 'MarkerSize', 6);
 
-OldPos = get(newAxes, 'Position');
-NewPos = [OldPos(1), OldPos(2), 7, 7];
+NewPos = [1.5, 1.5, 5, 5];
 set(newAxes, 'Position', NewPos);
 
 print(tmpFig, '-depsc', strcat(path, file));
-
 close(tmpFig);
 
 

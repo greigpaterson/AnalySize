@@ -89,6 +89,8 @@ handles.EM_Max = DataTransfer.EM_Max;
 handles.EM_Min = DataTransfer.EM_Min;
 handles.EM_R2 = DataTransfer.EM_R2;
 
+handles.Version = getappdata(MainWindow, 'Version');
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -126,14 +128,14 @@ set(hleg, 'FontUnits', FUnits, 'FontSize', FontSize3);
 
 set(get(handles.Var_Axes, 'XLabel'), 'String', 'Number of end members', 'FontUnits', FUnits, 'FontSize', FontSize1);
 set(get(handles.Var_Axes, 'YLabel'), 'String', 'R^2', 'FontUnits', FUnits, 'FontSize', FontSize1);
-set(get(handles.Var_Axes, 'Title'), 'String', 'End Member Variance', 'FontUnits', FUnits, 'FontSize', FontSize2);
+set(get(handles.Var_Axes, 'Title'), 'String', 'Linear Correlations', 'FontUnits', FUnits, 'FontSize', FontSize2);
 
 
 % Update the angular dev plot
 plot(handles.Angle_Axes, handles.Mean_Angle, '-ok', 'LineWidth', 2)
 hold(handles.Angle_Axes, 'on')
-plot(handles.Angle_Axes, 0, 0, '-r')
-plot(handles.Angle_Axes, 0, 0, '-xb', 'MarkerEdgeColor', [1,0,0])
+plot(handles.Angle_Axes, -1, 0, '-r')
+plot(handles.Angle_Axes, -1, 0, '-xb', 'MarkerEdgeColor', [1,0,0])
 hold(handles.Angle_Axes, 'off')
 Plot_BoxWhisker(handles.Angle_Axes, handles.Spec_Angle)
 
@@ -143,7 +145,7 @@ set(hleg, 'FontUnits', FUnits, 'FontSize', FontSize3);
 
 set(get(handles.Angle_Axes, 'XLabel'), 'String', 'Number of end members', 'FontUnits', FUnits, 'FontSize', FontSize1);
 set(get(handles.Angle_Axes, 'YLabel'), 'String', 'Angle (degrees)', 'FontUnits', FUnits, 'FontSize', FontSize1);
-set(get(handles.Angle_Axes, 'Title'), 'String', 'End Member Angular Deviation', 'FontUnits', FUnits, 'FontSize', FontSize2);
+set(get(handles.Angle_Axes, 'Title'), 'String', 'Angular Deviation', 'FontUnits', FUnits, 'FontSize', FontSize2);
 
 % update the default selection and labels
 set(handles.Selected_EM, 'Value', handles.EM_Min, 'String', sprintf('%d', handles.EM_Min));
@@ -298,16 +300,17 @@ if ~ischar(file) && file==0
 end
 
 
-tmpFig=figure('Visible', 'off', 'Units', 'Pixels','PaperPositionMode','auto');
+tmpFig=figure('Visible', 'off', 'Units', 'Centimeters','PaperPositionMode','auto');
 oldPos=get(tmpFig, 'Position');
-set(tmpFig, 'Position', [oldPos(1), oldPos(2), 800, 400]);
-
+set(tmpFig, 'Position', [oldPos(1), oldPos(2), 18, 7.5]);
 %% Do the first axes
 newAxes=copyobj(handles.Var_Axes, tmpFig);
 axis(newAxes, 'square');
 
+
 hleg1 = legend(newAxes, 'Data set', 'EM correlation', 'Specimen median', 'Specimen box & whisker', 'Location', 'SouthEast');
-set(hleg1, 'FontUnits', 'Points', 'FontSize', 8, 'Box', 'off');
+set(hleg1, 'FontUnits', 'Points', 'FontSize', 7, 'Box', 'off',...
+    'Units', 'Centimeters', 'Position', [13.5, 4.5, 4, 2]);
 
 % LegLines = findobj(hleg1, 'type','line');
 % XD = get(LegLines(2),'XData');
@@ -327,6 +330,7 @@ set(hleg1, 'FontUnits', 'Points', 'FontSize', 8, 'Box', 'off');
 %     set(LegText(ii), 'Position', PD);
 % end
 
+PlotSize = 5;
 
 % Adjust the figure
 set(newAxes, 'FontUnits', 'Points', 'FontSize', 9, 'Units', 'Centimeters')
@@ -334,36 +338,15 @@ set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 
-OldPos = get(newAxes, 'Position');
-NewPos = [OldPos(1), OldPos(2), 7.25, 7.25];
+% OldPos = get(newAxes, 'Position');
+NewPos = [1.5, 1.5, PlotSize, PlotSize];
 set(newAxes, 'Position', NewPos);
-A1P1 = OldPos(1);
+A1P1 = NewPos(1);
 
 
 %% Do the second axes
 newAxes2=copyobj(handles.Angle_Axes, tmpFig);
 axis(newAxes2, 'square')
-
-hleg2 = legend(newAxes2, 'Data set', 'Specimen median', 'Specimen box & whisker', 'Location', 'NorthEast');
-set(hleg2, 'FontUnits', 'Points', 'FontSize', 8, 'Box', 'off');
-
-% LegLines = findobj(hleg2, 'type','line');
-% XD = get(LegLines(2),'XData');
-% LineLen = (2/3) * (XD(2) - XD(1));
-% MidPoint = (1/2) * (XD(2) - XD(1));
-% 
-% set(LegLines(2:2:end),'XData', [XD(1), XD(1) + LineLen]);
-% set(LegLines,'MarkerSize', 5);
-% set(LegLines(1:2:end),'XData', MidPoint);
-% 
-% LegText = findobj(hleg2, 'type','text');
-% PosData = cell2mat(get(LegText, 'Position'));
-% Short = (XD(2) - XD(1)) - LineLen;
-% for ii = 1:size(PosData,1)
-%     PD = PosData(ii,:);
-%     PD(1) = PD(1) - Short;
-%     set(LegText(ii), 'Position', PD);
-% end
 
 % Adjust the figure
 set(newAxes2, 'FontUnits', 'Points', 'FontSize', 9, 'Units', 'Centimeters')
@@ -371,12 +354,28 @@ set(get(newAxes2, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes2, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes2, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 
-OldPos = get(newAxes2, 'Position');
-NewPos = [A1P1 + 9, OldPos(2), 7.25, 7.25];
+% OldPos = get(newAxes2, 'Position');
+NewPos = [A1P1 + PlotSize+1.5, 1.5, PlotSize, PlotSize];
 set(newAxes2, 'Position', NewPos);
 
-print(tmpFig, '-depsc', strcat(path, file));
+if handles.Version < 8.4
+    
+    % Reset the line widths
+    C = get(newAxes, 'Children');
+    for ii = 1: length(C);
+        set(C(ii),'LineWidth',1);
+    end
+    
+    C = get(newAxes2, 'Children');
+    for ii = 1: length(C);
+        set(C(ii),'LineWidth',1);
+    end
+    
+else
+    % TODO update for 2014b graphics
+end
 
+print(tmpFig, '-depsc', strcat(path, file));
 close(tmpFig);
 
 

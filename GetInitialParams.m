@@ -133,14 +133,16 @@ switch Fit_Type
         end
         
     case 'Weibull'
+%         
+%         A = length(GS)/2
         
-        Ahat = 50.*ones(n, 1);
-        Bhat = 5.*ones(n, 1);
+        Ahat = (length(GS)/2).*ones(n, 1);
+        Bhat = (length(GS)/4).*ones(n, 1);
         
         Init = [Ahat, Bhat];
         
         if n < kmax
-            Init(n+1:kmax,:) = repmat( [50, 5], kmax-n, 1);
+            Init(n+1:kmax,:) = repmat( [length(GS)/2, length(GS)/4], kmax-n, 1);
         end
         
     case 'SGG'

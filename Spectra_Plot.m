@@ -155,9 +155,9 @@ if ~ischar(file) && file==0
     return;
 end
 
-tmpFig=figure('Visible', 'off', 'Units', 'Pixels');
+tmpFig=figure('Visible', 'off', 'Units', 'Centimeters');
 oldPos=get(tmpFig, 'Position');
-set(tmpFig, 'Position', [oldPos(1), oldPos(2), 500, 500]); % make the figure bigger than needed (300x300)
+set(tmpFig, 'Position', [oldPos(1), oldPos(2), 7.5, 7.5]); % make the figure bigger than needed (300x300)
 
 % Copy and adjust the axes
 newAxes=copyobj(handles.Plot_Axes, tmpFig);
@@ -168,11 +168,11 @@ set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 % set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 
-NewPos = [5, 5, 7, 7];
+NewPos = [1.5, 1.5, 5, 5];
 set(newAxes, 'Position', NewPos);
 
 print(tmpFig, '-depsc', strcat(path, file));
-
+close(tmpFig);
 
 function Update_Plots(handles)
 

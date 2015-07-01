@@ -320,7 +320,7 @@ if Plot_Fits==1
     
     hold(handles.PDF_Axes, 'on')
     plot(handles.PDF_Axes, Xplot, 100.*PDF_Fits, '-k', 'LineWidth', 2)
-    plot(handles.PDF_Axes, Xplot, 100.*EM_Fits)
+    plot(handles.PDF_Axes, Xplot, 100.*EM_Fits, 'LineWidth', 1)
     hold(handles.PDF_Axes, 'off')
     
     tmp_r2 = handles.Specimen_QFit(handles.spec_ind,1);
@@ -333,7 +333,7 @@ if Plot_Fits==1
     cla(handles.EM_Axes, 'reset'); % Reset the axes
     set(handles.EM_Axes, 'ColorOrder', handles.Default_Plot_Colors);
     hold(handles.EM_Axes, 'on')
-    plot(handles.EM_Axes, Xplot, 100.*handles.Current_Fit_EMs)%, 'Color', handles.Default_Plot_Colors(1:4,:))
+    plot(handles.EM_Axes, Xplot, 100.*handles.Current_Fit_EMs, 'LineWidth', 1)%, 'Color', handles.Default_Plot_Colors(1:4,:))
     hold(handles.EM_Axes, 'off')
     
     set(get(handles.EM_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
@@ -975,9 +975,9 @@ if ~ischar(file) && file==0
 end
 
 
-tmpFig=figure('Visible', 'off', 'Units', 'Pixels','PaperPositionMode','auto');
+tmpFig=figure('Visible', 'off', 'Units', 'Centimeters','PaperPositionMode','auto');
 oldPos=get(tmpFig, 'Position');
-set(tmpFig, 'Position', [oldPos(1), oldPos(2), 500, 500]); % make the figure bigger than needed (300x300)
+set(tmpFig, 'Position', [oldPos(1), oldPos(2), 9, 7.5]); % make the figure bigger than needed (300x300)
 
 % Copy and adjust the axes
 newAxes=copyobj(handles.PDF_Axes, tmpFig);
@@ -1009,6 +1009,7 @@ end
 if handles.Version < 8.4    
     % Set the legend and adjust it's properties
     hleg = legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'off', 'FontUnits', 'Points', 'FontSize', 8);
+    set(hleg, 'Box', 'off')
     
     LegLines = findobj(hleg, 'type','line');
     XD = get(LegLines(2),'XData');
@@ -1037,13 +1038,13 @@ else
     % Set the legend and adjust it's properties
     legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'off', 'FontUnits', 'Points', 'FontSize', 8);
 end
+set(hleg, 'Box', 'off')
 
 % Reset to the desired size
-NewPos = [5, 5, 7, 7];
+NewPos = [1.5, 1.5, 5, 5];
 set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1]);
 
 print(tmpFig, '-depsc', strcat(path, file));
-
 close(tmpFig);
 
 
@@ -1067,9 +1068,9 @@ else
     end
     
     
-    tmpFig=figure('Visible', 'off', 'Units', 'Pixels','PaperPositionMode','auto');
+    tmpFig=figure('Visible', 'off', 'Units', 'Centimeters','PaperPositionMode','auto');
     oldPos=get(tmpFig, 'Position');
-    set(tmpFig, 'Position', [oldPos(1), oldPos(2), 500, 500]); % make the figure bigger than needed (300x300)
+    set(tmpFig, 'Position', [oldPos(1), oldPos(2), 9, 7.5]); % make the figure bigger than needed (300x300)
     
     % Copy and adjust the axes
     newAxes=copyobj(handles.EM_Axes, tmpFig);
@@ -1120,11 +1121,12 @@ else
     
     
     % Reset to the desired size
-    NewPos = [5, 5, 7, 7];
+    NewPos = [1.5, 1.5, 5, 5];
     set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1]);
     
     print(tmpFig, '-depsc', strcat(path, file));
-    
+    close(tmpFig);
+
 end
 
 
@@ -1224,7 +1226,7 @@ else
             for ii = 1:nData
                 Params = D{ii};
                 nEnd = size(Params,1);
-                Abunds = A{ii};
+                Abunds = 100.*A{ii};
                 if nEnd < nFits
                     Data_Out(ii,:) = [reshape(Abunds', 1, numel(Abunds)),...
                         reshape(Params', 1, numel(Params)), NaN(1, nParams*(nFits-nEnd)) ];
@@ -1369,7 +1371,7 @@ else
             [nFits, nParams] = size(Params);
             
             % Write the Header line
-            fprintf(D_out_file, '%s\t', handles.Current_Fit_Type);
+            fprintf(D_out_file, '%s', handles.Current_Fit_Type);
             for ii =1 :nParams
                 fprintf(D_out_file, '\t%s', strcat('Param', sprintf('% d', ii)));
             end

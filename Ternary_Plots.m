@@ -178,23 +178,52 @@ if ~ischar(file) && file==0
     return;
 end
 
-tmpFig=figure('Visible', 'off', 'Units', 'Pixels','PaperPositionMode','auto');
+BaseX = 0.3;
+BaseY = 0.3;
+Fig_Width = 8.4;
+Fig_Height = 7;
+FontSize = 6;
+
+if get(handles.Plot_Select, 'Value') == 4 % Folk Coarse plot
+BaseX = 0.5;
+BaseY = 0.4;
+Fig_Width = 9;
+end
+
+
+tmpFig=figure('Visible', 'off', 'Units', 'Centimeters','PaperPositionMode','auto');
 oldPos=get(tmpFig, 'Position');
-set(tmpFig, 'Position', [oldPos(1), oldPos(2), 800, 800]);
+set(tmpFig, 'Position', [oldPos(1), oldPos(2), Fig_Width, Fig_Height]);
 
 newAxes = copyobj(handles.Tern_Axes, tmpFig);
 
+NewMarkerSize = handles.Symbol_Size./2;
+
+if handles.Version < 8.4
+    
+    % Reset the line widths
+    C = get(newAxes, 'Children');
+%     keyboard
+    for ii = 1: length(C);
+        try %#ok<TRYNC>
+            set(C(ii),'MarkerSize',NewMarkerSize);
+        end
+    end
+    
+else
+    % TODO update for 2014b graphics
+end
+
 % Reduce the font size a little
 TextObjs = findobj(newAxes, 'Type', 'Text');
-set(TextObjs, 'FontUnits', 'Points', 'FontSize', 8);
+set(TextObjs, 'FontUnits', 'Points', 'FontSize', FontSize);
 
 set(newAxes, 'Units', 'Centimeters')
-OldPos = get(newAxes, 'Position');
-NewPos = [OldPos(1), OldPos(2), 13, sqrt(13^2-6.5^2)];
+% OldPos = get(newAxes, 'Position');
+NewPos = [BaseX, BaseY, 8, sqrt(8^2-4^2)];
 set(newAxes, 'Position', NewPos);
 
 print(tmpFig, '-depsc', strcat(path, file));
-
 close(tmpFig);
 
 
@@ -407,6 +436,7 @@ plot(handles.Tern_Axes, Data_x, Data_y, handles.Plot_Symbol,...
     'color', handles.Symbol_Color, 'MarkerSize', handles.Symbol_Size, 'MarkerFaceColor', handles.Face_Color);
 hold(handles.Tern_Axes, 'off')
 
+
 function Set_Folk_Fine(handles)
 %
 % Plot the Shepard fines plot
@@ -507,7 +537,6 @@ plot(sp2(:,1), sp2(:,2), '--k')
 plot(handles.Tern_Axes, Data_x, Data_y, handles.Plot_Symbol,...
     'color', handles.Symbol_Color, 'MarkerSize', handles.Symbol_Size, 'MarkerFaceColor', handles.Face_Color);
 hold(handles.Tern_Axes, 'off')
-% Set_Labels('Sand', 'Silt', 'Clay')
 
 
 function Set_Folk_Coarse(handles)
