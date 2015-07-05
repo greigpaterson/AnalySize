@@ -92,6 +92,8 @@ start_val = min([handles.EM_Global_Max, 3]);
 
 set(handles.EM_Max, 'Value', start_val, 'String', sprintf('%d', start_val) );
 
+handles.EMA_Initial = 1;
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -163,7 +165,7 @@ tmpVar = cellstr(get(handles.Dist_Type,'String'));
 
 % Parametric fit parameters
 Para_Fit_Params = {get(handles.EM_Max, 'Value'), tmpVar(get(handles.Dist_Type, 'Value')),...
-    get(handles.Abund_Limit, 'Value')./100, get(handles.EMA_Initial, 'Value') };
+    get(handles.Abund_Limit, 'Value')./100, handles.EMA_Initial };
 
 % Get the data
 X = getappdata(handles.MainWindow, 'Data_To_Fit');
@@ -250,6 +252,7 @@ function DB_ME_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 keyboard
 
+
 function Abund_Limit_Callback(hObject, eventdata, handles)
 % hObject    handle to Abund_Limit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -280,11 +283,3 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-% --- Executes on button press in EMA_Initial.
-function EMA_Initial_Callback(hObject, eventdata, handles)
-% hObject    handle to EMA_Initial (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of EMA_Initial

@@ -156,28 +156,36 @@ function OK_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Do the censoring
+% Check the bounds for comaptibility
+Compatible = handles.GS_Min < handles.GS_Max;
 
-% Set the cancel flag to zero
-Return.CancelFlag = 0;
-
-% Set the data to local variables
-All_Data = handles.All_Data;
-All_GS = handles.All_GS;
-GS = handles.GS;
-
-% Get a logical array of indices to exclude
-inds = (GS(:,1) > handles.GS_Min & GS(:,1) < handles.GS_Max);
-
-% Set the data to return
-Return.All_Data = cellfun(@(x) x(~inds), All_Data, 'UniformOutput', 0); % Remove the indices
-Return.All_Data = cellfun(@(x) x./sum(x), Return.All_Data, 'UniformOutput', 0); % renormlaize to sum-to-one
-Return.All_GS = cellfun(@(x) x(~inds), All_GS, 'UniformOutput', 0);
-
-handles.output = Return;
-guidata(hObject,handles);
-
-uiresume(handles.Censor_Data_Figure);
+if ~Compatible
+    warndlg('Lower bound should be less than upper bound.', 'Incompatible bounds', 'modal')
+    return;
+else
+    % Do the censoring
+    
+    % Set the cancel flag to zero
+    Return.CancelFlag = 0;
+    
+    % Set the data to local variables
+    All_Data = handles.All_Data;
+    All_GS = handles.All_GS;
+    GS = handles.GS;
+    
+    % Get a logical array of indices to exclude
+    inds = (GS(:,1) > handles.GS_Min & GS(:,1) < handles.GS_Max);
+    
+    % Set the data to return
+    Return.All_Data = cellfun(@(x) x(~inds), All_Data, 'UniformOutput', 0); % Remove the indices
+    Return.All_Data = cellfun(@(x) x./sum(x), Return.All_Data, 'UniformOutput', 0); % renormlaize to sum-to-one
+    Return.All_GS = cellfun(@(x) x(~inds), All_GS, 'UniformOutput', 0);
+    
+    handles.output = Return;
+    guidata(hObject,handles);
+    
+    uiresume(handles.Censor_Data_Figure);
+end
 
 
 
@@ -194,8 +202,10 @@ new_val=str2double(get(hObject,'String') );
 if isnan(new_val) || new_val < 0
     set(handles.GS_Min_input, 'String', sprintf('%3.3f', handles.GS_Min));
 elseif new_val > handles.GS_Max
-    set(handles.GS_Min_input, 'String', sprintf('%3.3f', handles.GS_Max));
-    handles.GS_Min = handles.GS_Max;
+%     set(handles.GS_Min_input, 'String', sprintf('%3.3f', handles.GS_Max));
+%     handles.GS_Min = handles.GS_Max;
+    handles.GS_Min = new_val;
+    warndlg('Lower bound should be less than upper bound.', 'Incompatible bounds', 'modal')
 else
     set(handles.GS_Min_input, 'String', sprintf('%3.3f', max(new_val)));
     handles.GS_Min = new_val;
@@ -230,8 +240,10 @@ new_val=str2double(get(hObject,'String') );
 if isnan(new_val) || new_val > max(handles.GS(:,1))
     set(handles.GS_Max_input, 'String', sprintf('%3.3f', max(handles.GS(:,1))) );
 elseif new_val < handles.GS_Min
-    set(handles.GS_Max_input, 'String', sprintf('%3.3f', handles.GS_Min));
-    handles.GS_Max = handles.GS_Min;
+%     set(handles.GS_Max_input, 'String', sprintf('%3.3f', handles.GS_Min));
+%     handles.GS_Max = handles.GS_Min;
+    handles.GS_Max = new_val;
+    warndlg('Upper bound should be greater than lower bound.', 'Incompatible bounds', 'modal')
 else
     set(handles.GS_Max_input, 'String', sprintf('%3.3f', max(new_val)));
     handles.GS_Max = new_val;
