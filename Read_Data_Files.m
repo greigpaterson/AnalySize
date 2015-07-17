@@ -127,7 +127,7 @@ switch File_Type_Flag
             
         end
                 
-    case 'Coulter' % Original $LS Data file
+    case 'Coulter' % $LS Data file
         
         Sample_Names=cell(nfiles,1);
         Grain_Size=cell(1,nfiles);
@@ -182,7 +182,7 @@ switch File_Type_Flag
                 tmp_input=textscan(FID, '%f', 'HeaderLines', GS_start);
                 tmp_GS=tmp_input{1,1};
                 
-                HL=Data_start-(GS_start+length(tmp_GS)); % Get the nex header lines to skip
+                HL=Data_start-(GS_start+length(tmp_GS)); % Get the next header lines to skip
                 
                 tmp_input=textscan(FID, '%f', 'HeaderLines', HL);
                 tmp_Data=tmp_input{1,1}./sum(tmp_input{1,1});
@@ -192,12 +192,14 @@ switch File_Type_Flag
                 tmp_input=textscan(FID, '%f', 'HeaderLines', Data_start);
                 tmp_Data=tmp_input{1,1}./sum(tmp_input{1,1});
                 
-                HL=GS_start-(Data_start+length(tmp_Data)); % Get the nex header lines to skip
+                HL=GS_start-(Data_start+length(tmp_Data)); % Get the next header lines to skip
                 
                 tmp_input=textscan(FID, '%f', 'HeaderLines', HL);
                 tmp_GS=tmp_input{1,1};
                 
             end
+            
+%             keyboard
             
             fclose(FID);
                         

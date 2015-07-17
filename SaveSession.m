@@ -1,4 +1,7 @@
 function SaveSession(handles)
+%
+% Function to save an AnalySize session
+%
 
 % Get the output file
 [file,path] = uiputfile('AnalySize_Saved_Session.mat','Save session...');

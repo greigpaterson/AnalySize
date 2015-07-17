@@ -41,7 +41,7 @@ h = waitbar(0,'Initializing....', 'Name', 'Calculating end member fits...',...
 setappdata(h,'Cancelled',0)
 Cancel_Flag = 0;
 
-[Lower, Upper, Initial_Params] = GetInitialParams(X, GS, k, Fit_Type);
+[Lower, Upper, Initial_Params] = GetInitialParams(X, GS, k, k, Fit_Type);
 Initial = Initial_Params{k,1};
 
 % Get an intial guess using EMA
@@ -50,7 +50,7 @@ if EMA_Initial
     [~, ~, tmp_EM] = Unmix_Para_EMs(X, GS, k, Fit_Type, Params, 'Projection');
 
     % Sort the EMs
-    [~, Sinds] = sortEMs(tmp_EM, GS);
+    [~, Sinds] = sortEMs(tmp_EM, GS, 'Median');
     Initial = Params(Sinds,:);
 end
 
@@ -91,7 +91,7 @@ for ii = 1:nData
     nFit = size(tmp_EMs, 1); % the number of actual fitted end members
     
     % Sort the EMs
-    [tmp_EMs, Sinds] = sortEMs(tmp_EMs, GS);
+    [tmp_EMs, Sinds] = sortEMs(tmp_EMs, GS, 'Median');
     Params = Params(Sinds,:);
     tmp_Abunds = tmp_Abunds(Sinds);
     

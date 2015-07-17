@@ -307,10 +307,12 @@ set(tmpFig, 'Position', [oldPos(1), oldPos(2), 18, 7.5]);
 newAxes=copyobj(handles.Var_Axes, tmpFig);
 axis(newAxes, 'square');
 
+PlotSize = 4.5;
+
 
 hleg1 = legend(newAxes, 'Data set', 'EM correlation', 'Specimen median', 'Specimen box & whisker', 'Location', 'SouthEast');
 set(hleg1, 'FontUnits', 'Points', 'FontSize', 7, 'Box', 'off',...
-    'Units', 'Centimeters', 'Position', [13.5, 4.5, 4, 2]);
+    'Units', 'Centimeters', 'Position', [12.5, 4, 4, 2]);
 
 % LegLines = findobj(hleg1, 'type','line');
 % XD = get(LegLines(2),'XData');
@@ -330,7 +332,6 @@ set(hleg1, 'FontUnits', 'Points', 'FontSize', 7, 'Box', 'off',...
 %     set(LegText(ii), 'Position', PD);
 % end
 
-PlotSize = 5;
 
 % Adjust the figure
 set(newAxes, 'FontUnits', 'Points', 'FontSize', 9, 'Units', 'Centimeters')

@@ -3,6 +3,34 @@ function [MisFit, Xprime, EM, A, Validity] = Unmix_Para_EMs(X, GS, k, Fit_Type, 
 % Function to determine the end member abundances to fully unmix a given
 % data set into specified paramtric end members
 %
+% Input:
+%       X - nData x nVar matrix containing the observed data
+%       GS - nVar x 1 vector of data bins
+%       k - the number of end members to fit
+%       Fit_Type - string containing the name of the distribution to fit
+%       Params - the distribution paramters
+%       Algorithm - the algorithm to use for determining the abundances.
+%                   Either 'Projection" for the SPU algorithm of [1], or 
+%                   'FCLS' for the fully constrained least squares 
+%                   algorithm of [2].
+%
+% Output:
+%       MisFit - the Forbenius norm of X-Xprime
+%       Xprime - nData x nVar matrix of reconstructed data
+%                (Normalized to sum-to-one)
+%       EMs - k x nVar matrix of end member vectors
+%       A - nData x k matrix of abundances
+%       Validitity - Flag to indicate the validity of the SPU solution
+%
+% References:
+%
+% [1] Heylen et al. (2011), Fully Constrained Least Squares Spectral
+%     Unmixing by Simplex Projection, Geoscience and Remote Sensing, IEEE
+%     Transactions on, 49, 4112-4122, doi: 10.1109/TGRS.2011.2155070
+%
+% [2] Heinz, D.C., and C.-I Chang (2001), Fully constrained least squares 
+%     linear spectral mixture analysis method for material quantification 
+%     in hyperspectral imagery, IEEE Tran. GRS, vol. 39, 529-545.
 %
 
 %% Generate the end members
@@ -21,7 +49,8 @@ switch Fit_Type
         
     case 'Gen. Weibull'
         for ii=1:k
-            EM(:,ii) = genwblpdf(log(GS), Params(ii,1), Params(ii,2), Params(ii,3));
+%             EM(:,ii) = genwblpdf(log(GS), Params(ii,1), Params(ii,2), Params(ii,3));
+            EM(:,ii) = genwblpdf(1:length(GS), Params(ii,1), Params(ii,2), Params(ii,3));
         end
         
     case 'SGG'

@@ -65,7 +65,7 @@ for k=EM_Min:EM_Max
     [tmp_EM, tmp_Abunds, Xprime] = HALS_NMF(X, k, 5e3, 1e1);
     
     % Sort the EMs
-    [tmp_EM, Sinds] = sortEMs(tmp_EM, GS);
+    [tmp_EM, Sinds] = sortEMs(tmp_EM, GS, 'Median');
     tmp_Abunds = tmp_Abunds(:,Sinds);
     
     Stored_Xprime(k) = {Xprime};

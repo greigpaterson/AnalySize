@@ -168,11 +168,12 @@ set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 % set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 
-NewPos = [1.5, 1.5, 5, 5];
+NewPos = [1.5, 1.5, 4.5, 4.5];
 set(newAxes, 'Position', NewPos);
 
 print(tmpFig, '-depsc', strcat(path, file));
 close(tmpFig);
+
 
 function Update_Plots(handles)
 
@@ -206,7 +207,6 @@ switch Plot_Type
         set(get(handles.Plot_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
 %         set(get(handles.Plot_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
 end
-
 
 % --- Executes when entered data in editable cell(s) in Spec_Table.
 function Spec_Table_CellEditCallback(hObject, eventdata, handles)

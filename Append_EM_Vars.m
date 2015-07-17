@@ -2,6 +2,15 @@ function Data = Append_EM_Vars(Old, New)
 %
 % Appends the parametric end member fits to previous fits
 %
+% Input:
+%       Old - the old fit data
+%       New - the new fit data
+%
+% Output:
+%       Data - the amalgamated data
+%
+
+%% Begin...
 
 % Get some basic sizes and values
 nData = size(Old.Spec_Angle, 1);

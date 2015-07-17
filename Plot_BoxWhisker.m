@@ -1,12 +1,10 @@
 function Plot_BoxWhisker(Axis_Handles, data)
 %
 % Function to plot a box and whisker diagram for end member selection
-% Arguments: data0 -  unsorted data, mxn, m samples, n columns
-%            lineWidth -  line thickness in the plot default = 1;
-%            width -  the width of the box, default = 1;
-% Returns:
 %
-% Notes: each column is considered as a single set
+% Input:
+%      Axis_Hanldes -  the axis handle to plot on
+%      data -  the data to plot
 %
 
 width = 0.1;
@@ -24,7 +22,7 @@ OL = cell(n, 1);
 
 for ii = 1:n
     
-    tmp_data = sort(data(:,ii), 1); % ascending
+    tmp_data = sort(data(:,ii), 1);
     
     if any(isnan(tmp_data))
         OL(ii) = {NaN};

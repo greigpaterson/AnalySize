@@ -85,6 +85,8 @@ end
 % Set some defaults
 handles.Fit_Type = 1; % Non-Parametric endmember unmixing problem as default
 
+handles.EM_File_Loaded = 0; % Check if defined EM file is loaded
+
 % Get the maximum number of end members to fit
 EM_Max_Default = 10;
 
@@ -224,6 +226,8 @@ try
     
     handles.EMs_To_Fit = [GS_Data, EMs];
     guidata(hObject, handles);
+    
+    handles.EM_File_Loaded = 1; % Loaded flag
     
     msgbox(MSG, 'File loaded', 'modal')
     
@@ -388,6 +392,11 @@ switch handles.Fit_Type
         Return_struct.FitStatus = ~Cancel_Flag; % if cancelled then == 0
                 
     case 3 % Defined End Members
+        
+        if handles.EM_File_Loaded ~= 1
+            warndlg('No end member file is loaded.', 'File not loaded', 'modal')
+            return
+        end
         
         [Abunds, EMs, Fit_Quality] = GetDefinedFit(X, GS, handles.EMs_To_Fit);
         

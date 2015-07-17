@@ -1,4 +1,7 @@
 function handles = LoadSession(handles)
+%
+% Function to load a saved AnalySize session
+%
 
 [file,path] = uigetfile('*.mat','Load a saved session...');
 

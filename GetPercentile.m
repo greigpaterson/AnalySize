@@ -2,6 +2,13 @@ function y = GetPercentile(X, GS, pvals)
 %
 % Function to return the grain size for a given percentile.
 %
+% Input:
+%       X - nData x nVar matrix containing the observed data
+%       GS - nVar x 1 vector of data bins
+%       pvals - vector of percentile to get
+%
+% Output:
+%       y - the grain sizes at pvals
 %
 
 pvals = pvals./100;

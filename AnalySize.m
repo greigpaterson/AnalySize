@@ -656,8 +656,8 @@ function Load_Test_Data_Callback(hObject, eventdata, handles)
 % % Set and plot the current data
 % func_handles=Set_Current_Data(handles);
 % handles=func_handles;
-
-% save the updated handles
+% 
+% % save the updated handles
 guidata(hObject, handles);
 
 
@@ -1041,7 +1041,7 @@ end
 set(hleg, 'Box', 'off')
 
 % Reset to the desired size
-NewPos = [1.5, 1.5, 5, 5];
+NewPos = [1.5, 1.5, 4.5, 4.5];
 set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1]);
 
 print(tmpFig, '-depsc', strcat(path, file));
@@ -1121,7 +1121,7 @@ else
     
     
     % Reset to the desired size
-    NewPos = [1.5, 1.5, 5, 5];
+    NewPos = [1.5, 1.5, 4.5, 4.5];
     set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1]);
     
     print(tmpFig, '-depsc', strcat(path, file));

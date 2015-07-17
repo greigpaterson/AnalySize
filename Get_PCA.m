@@ -1,10 +1,16 @@
 function [pc, score, latent] = Get_PCA(x)
+%
 % Principal Component Analysis with no centering of the data.
-%   [pc, score, latent] = Get_PCA(X) takes a data matrix X and
-%   returns the principal components in PC, the so-called Z-scores in SCORES,
-%   the eigenvalues of the covariance matrix of X in LATENT
 % Based on the MATLAB pca function
-
+%
+% Inputs: 
+%       x - the data matrix
+%
+% Outputs:
+%       pc - the principal components
+%       score - principal component score (x projected into the PC space)
+%       latent - the eigenvalues of the covariance matrix of X
+%
 
 [m,n] = size(x);
 r = min(m-1,n);     % max possible rank of x

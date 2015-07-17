@@ -6,6 +6,7 @@ function [Cancel_Flag, Abunds, EMs, Dist_Params, Fit_Quality, Transfer] = GetPar
 %       Xin - nData x nVar matrix containing the observed data
 %       GS - nVar x 1 vector of data bins
 %       Fit_Params - 5 x 1 cell of parameters specifying fit options
+%       Sel_EM_Data - Previous parametric fit data
 %
 % Output:
 %        Cancel_Flag - a flag to indicate whether (= 1) or not (= 0) the
@@ -17,6 +18,7 @@ function [Cancel_Flag, Abunds, EMs, Dist_Params, Fit_Quality, Transfer] = GetPar
 %        Fit_Quality - cell array containing measures of the goodness of
 %                      fit for the best-fit endmembers{[R2(Selected_EM,
 %                      Mean_Angle], [Spec_R2, Spec_Angle]};
+%
 %
 
 %% Process the inputs
@@ -30,8 +32,6 @@ X = Xin; % Assign the original data to X
 EM_Min =  Fit_Params{1};
 EM_Max = Fit_Params{2};
 Fit_Type = char(Fit_Params{3});
-
-options=optimset('MaxIter', 1e4, 'MaxFun', 1e4, 'TolX', 1e-4, 'TolFun', 1e-4, 'Display', 'off');
 
 %% Check for previous input
 switch Fit_Type
@@ -91,16 +91,30 @@ if Flag == 0
         'CreateCancelBtn', 'setappdata(gcbf,''Cancelled'',1)');
     setappdata(h,'Cancelled',0)
     Cancel_Flag = 0;
-    
-    [Lower, Upper, Initial_Params] = GetInitialParams(X, GS, EM_Max, Fit_Type);
-%     toc
-    
-    
+
+    [Lower, Upper, Initial_Params] = GetInitialParams(X, GS, EM_Min, EM_Max, Fit_Type);
+
+    %     toc
+
     %% The main loop
+    
+    % suppress rank deficient warnings. This is often needed for high numbers
+    % of end members, which are over-fitting the data
+    warning('off', 'MATLAB:rankDeficientMatrix');
+    
+    % Set options for the search
+    options=optimset('MaxIter', 1e4, 'MaxFun', 1e4, 'TolX', 1e-4, 'TolFun', 1e-4, 'Display', 'off');
+    
+    % Check for Cancel button press
+    if getappdata(h,'Cancelled')
+            Cancel_Flag = 1;
+    end
+    
+    
     for k = EM_Min:EM_Max
         
         % Check for Cancel button press
-        if getappdata(h,'Cancelled')
+        if Cancel_Flag == 1 || getappdata(h,'Cancelled')
             Cancel_Flag = 1;
             break;
         end
@@ -115,7 +129,7 @@ if Flag == 0
         [~, Xprime, tmp_EM] = Unmix_Para_EMs(X, GS, k, Fit_Type, Params, 'Projection');
         
         % Sort the EMs
-        [tmp_EM, Sinds] = sortEMs(tmp_EM, GS);
+        [tmp_EM, Sinds] = sortEMs(tmp_EM, GS, 'Median');
         Params = Params(Sinds,:);
         
         Stored_Params(k) = {Params};
@@ -140,7 +154,10 @@ if Flag == 0
         
     end
     
-    delete(h)
+    % Turn the warning back on
+    warning('on', 'MATLAB:rankDeficientMatrix');
+    
+    delete(h) % delete the waitbar
 %     toc
     
     if Cancel_Flag == 1

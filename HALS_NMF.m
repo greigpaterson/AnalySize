@@ -28,17 +28,17 @@ function [EMs, Abunds, Xprime] = HALS_NMF(X, k, MaxIter, Reps, Verbose)
 %% Inputs checks, defaults and warnings
 
 if nargin < 2
-    error('F_NFM:Input', 'At least 2 inputs are required.');
+    error('HALS_NMF:Input', 'At least 2 inputs are required.');
 end
 
 if isempty(X)
-    error('F_NFM:Data', 'No data provided.');
+    error('HALS_NMF:Data', 'No data provided.');
 end
 
 [nData, nVar] = size(X);
 
 if k > nVar ||  rem(k,1) %check integer
-    error('GF_NFM:EM', 'Number of endmembers must be an integer between 1 and %d.', nVar);
+    error('HALS_NMF:EM', 'Number of endmembers must be an integer between 1 and %d.', nVar);
 end
 
 if nargin < 3
@@ -63,11 +63,10 @@ TolFun = eps;
 %% The main function
 
 % The regularization parameters
-a1 = 5; % Sum-to-one constraint
+a1 = 5; % Sum-to-one constraint on abundances
 a2 = 0; % Maximum spatial dispersion constraint
 b1 = 0; % Minimum spectral disperison constraint
 b2 = 0; % Minimum distance constraint
-
 
 % preallocate for speed
 final_resid = NaN(Reps, 1);
@@ -117,7 +116,11 @@ for Rep_ind = 1:Reps
             
             Sk = (Ak'*Xk + a1* (ones(1,nData) - S_sum ) - (a2/k)*ones(1,nData) )...
                 ./ ( norm(Ak, 'fro').^2 + a1 - a2 );
-                       
+            
+            % Sum to one constraint only
+%             Sk = (Ak'*Xk + a1* (ones(1,nData) - S_sum ))...
+%                 ./ ( norm(Ak, 'fro').^2 + a1 );
+            
             % Update Sk with the maximum function and add to S
             Sk(Sk > 1) = 1;
             Sk = max(0, Sk);
@@ -125,10 +128,13 @@ for Rep_ind = 1:Reps
                         
             % Update Ak
             A_sum = sum(A,2) - Ak;
-            
+                                    
             Ak = ( Xk*Sk' + (b2/k)*(1-1/k)*(eye(nVar) - ones(nVar)./nVar)*A_sum )'...
                 / ( norm(Sk, 'fro').^2*eye(nVar) + (eye(nVar) - ones(nVar)./nVar) * (b1+b2*(1-1/k)^2) );
             
+            % sum to one constaint only
+%             Ak = (Xk*Sk')' / (norm(Sk, 'fro').^2*eye(nVar));
+
             Ak = Ak'; % The above adds a transpose the numerator and uses matrix division
             
             % Update Ak with the maximum function and add to A
@@ -185,6 +191,8 @@ S = All_S{Min_ind};
 % Assign to the output variables and redo sum to one to remove rounding errors
 EMs = A';
 EMs = EMs./repmat(sum(EMs,2), 1,nVar);
+
+% Apply FCLS to ensure all constraints are met
 Abunds = Get_FCLS(X, EMs);
 
 
@@ -201,8 +209,8 @@ if Verbose == 1
     
     Xprime_Orig = S'*A';
     
-    N1 = norm(X-Xprime, 'fro');
-    N2 = norm(X-Xprime_Orig, 'fro');
+    N1 = norm(X-Xprime_Orig, 'fro');
+    N2 = norm(X-Xprime, 'fro');
     
     % OUTPUT CHECK FOR TESTING
     disp(' ')

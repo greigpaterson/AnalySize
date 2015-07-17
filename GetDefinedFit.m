@@ -23,7 +23,7 @@ function [Abunds, EMs, Fit_Quality] = GetDefinedFit(Xin, GS, EM_in)
 %% Process the inputs
 
 X = Xin; % Assign the original data to X
-[nData,nVar] = size(X);
+[~,nVar] = size(X);
 
 EM_GS = EM_in(:,1);
 Input_EMs = EM_in(:,2:end)';

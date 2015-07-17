@@ -1,26 +1,36 @@
-function [Lower, Upper, Intial] = GetInitialParams(X, GS, kmax, Fit_Type, Get_Initial)
+function [Lower, Upper, Initial] = GetInitialParams(X, GS, kmin, kmax, Fit_Type)
 %
-% Function the returns the lower and upper bounds for the parameters of the
-% parametric distributions. It also returns intial guesses for parameter
-% values that are used for the search rotuine.
-% 
+% Function the returns the lower and upper bounds and intial guesses for 
+% the parameters of the parametric distributions.
+%
+% Input:
+%       X - nData x nVar matrix containing the observed data
+%       GS - nVar x 1 vector of data bins
+%       kmin - the minimum number of end members to fit
+%       kmax - the maximum number of end members to fit
+%       Fit_Type - string containing the name of the distribution to fit
+%
+% Output:
+%       Lower - Matrix containing the parameter lower bounds
+%       Upper - Matrix containing the parameter upper bounds
+%       Initial - Cell array containing the parameter initial guesses
+%
+
 %% Get some basic stuff
 
-if nargin < 5
-    Get_Initial = 1;
-end
+% Get dimensions
+[nData, ~] = size(X);
 
-% Get indices of all non-zero data
-[nData, nVar] = size(X);
-Xn = X./repmat(max(X, [], 2), 1, nVar);
+LGS = log(GS); % log grain size
 
-LGS = log(GS);
+%% Start by getting the lower and upper bounds
+%
+% These are based on the limits of the data
+%
 
 % Get indices of all non-zero data
 NZi = sum(X==0)~=nData;
-
-
-%% Start by getting the lower and upper bounds
+NZi_Lims = [find(LGS == min(LGS(NZi))), find(LGS == max(LGS(NZi)))]; % Grain size indices for start and end points
 
 switch Fit_Type
     case 'Lognormal'
@@ -34,12 +44,11 @@ switch Fit_Type
         % reduce the scale parameter by 2*k
         % This help to minimize end member correlation
         Upper(:,2) = Upper(:,2) ./ (2.*(1:kmax)') ;
-
-    case 'Gen. Weibull'
         
-        Lower = repmat([1e-4, 1 + 1e-4, min(LGS(NZi))], kmax, 1);
-%         Upper = repmat([2*( max(LGS) - min(LGS) ), max(GS)/100, max(LGS(NZi))], k, 1);
-        Upper = repmat([( max(LGS) - min(LGS) ), 2*( max(LGS) - min(LGS) ), max(LGS(NZi))], kmax, 1);
+    case 'Gen. Weibull'
+                
+        Lower = repmat([1, 2, NZi_Lims(1)], kmax, 1);
+        Upper = repmat([length(NZi), length(GS), NZi_Lims(2)], kmax, 1);
         
     case 'Weibull'
         
@@ -48,9 +57,11 @@ switch Fit_Type
         
     case 'SGG'
         
-        Lower = repmat([min(LGS(NZi)), min(abs(diff(LGS(NZi)))), -1], kmax,1);
+        % q has lower bound of 1e-4 (approx. zero) to kept realistc values
+        % of p after the maximum entropy transformation
+        Lower = repmat([min(LGS(NZi)), min(abs(diff(LGS(NZi)))), 1e-4], kmax,1);
         Upper = repmat([max(LGS(NZi)), max(LGS(NZi)) - min(LGS(NZi)), 1], kmax,1);
-
+        
         % reduce the scale parameter by 2*k
         Upper(:,2) = Upper(:,2) ./ (2.*(1:kmax)') ;
         
@@ -62,123 +73,157 @@ end
 
 %% Get the intial guesses
 
-if Get_Initial ~= 1
-    Intial = [];
-    return
-end
+% suppress rank deficient warnings for this intial search
+warning('off', 'MATLAB:rankDeficientMatrix');
 
-% tic
+% Set options for the search
+options=optimset('MaxIter', 1e3, 'MaxFun', 1e3, 'TolX', 1e-3, 'TolFun', 1e-3, 'Display', 'off');
 
-% Get the data gradients
-dX = gradient(X);
-% dX2 = gradient(dX);
-
-% Get the number of stationary points for each row
-Stat_pts = diff(sign(dX), [], 2);
-Stat_pts(Xn(:,1:end-1) < 0.05) = 0; % Set stat pts with low density to zero
-
-Nstat_pts = sum(Stat_pts ~=0 , 2); % Get the number of pts
-
-[~,inds] = sort(Nstat_pts, 'descend'); % sort the get the maximum
-I_data = X(inds(1),:);
-% I_data = X(inds(1:max(nData,5)),:);
-I_Stat_pts = Stat_pts(inds(1),:);
-
-% I_Stat_pts == -2 corresponds to dX going from positive to negative (dx2
-% negative) X is a maxima
-% I_Stat_pts == 2 corresponds to dX going from negative to positive (dX2
-% positive) X is a minima
-Pos2Neg_inds = find(I_Stat_pts==-2);
-Neg2Pos_inds = find(I_Stat_pts==2);
-
-tmp_X = mean([I_data(Pos2Neg_inds)', I_data(Pos2Neg_inds+1)'], 2);
-tmp_GS = mean([LGS(Pos2Neg_inds), LGS(Pos2Neg_inds+1)], 2);
-
-tmp_sorted = sortrows([tmp_X, tmp_GS, abs([tmp_GS(1)/4; diff(tmp_GS)/4]) ], -1);
-
-tmp_X = mean([I_data(Neg2Pos_inds)', I_data(Neg2Pos_inds+1)'], 2);
-tmp_GS = mean([LGS(Neg2Pos_inds), LGS(Neg2Pos_inds+1)], 2);
-
-try 
-    % Sometimes tmp_X and/or tmp_GS are empty, so try/catch
-    tmp_sorted2 = sortrows([tmp_X, tmp_GS, abs([tmp_GS(1)/4; diff(tmp_GS)/4]) ], -1);
-    tmp_sorted = [tmp_sorted; tmp_sorted2];
-catch
-    % do nothing
-end
-
-n = size(tmp_sorted, 1);
-
-% The inital guesses
-switch Fit_Type
-    
-    case 'Lognormal'
-        Init = [tmp_sorted(:,2), tmp_sorted(:,3)];
-        
-        if n < kmax
-            Init(n+1:kmax,:) = repmat( mean([Lower(1,:); Upper(1,:)]), kmax-n, 1);
-        end
-        
-    case 'Gen. Weibull'
-        
-        Bhat = 2.*ones(n, 1);
-        Ahat = 2.*ones(n, 1);
-
-        mu = [min(LGS(NZi)); max( min(LGS(NZi)), tmp_sorted(2:end,2)./2)];
-
-        Init = [Ahat, Bhat, mu ];
-        
-        if n < kmax
-            Init(n+1:kmax,:) = repmat( [2, 2, mu(1)], kmax-n, 1);
-        end
-        
-    case 'Weibull'
-%         
-%         A = length(GS)/2
-        
-        Ahat = (length(GS)/2).*ones(n, 1);
-        Bhat = (length(GS)/4).*ones(n, 1);
-        
-        Init = [Ahat, Bhat];
-        
-        if n < kmax
-            Init(n+1:kmax,:) = repmat( [length(GS)/2, length(GS)/4], kmax-n, 1);
-        end
-        
-    case 'SGG'
-
-        Init = [tmp_sorted(:,2), tmp_sorted(:,3), ones(n,1)];
-        
-        if n < kmax
-            Init(n+1:kmax,:) = repmat( [mean(tmp_sorted(:,2)), mean(tmp_sorted(:,3)), 1 ], kmax-n, 1);
-        end
-        
-    case 'GEV'
-
-        Init = [tmp_sorted(:,2), tmp_sorted(:,3), zeros(n, 1)];
-        
-        if n < kmax
-            Init(n+1:kmax,:) = repmat( [mean([Lower(1,2:end); Upper(1,2:end)]), 0 ], kmax-n, 1);
-        end
-        
-end
-
-% The fit loop
-Intial=cell(kmax, 1); % for storing the parameters
+% for storing the parameters
+Initial=cell(kmax, 1); 
 fval=NaN(kmax,1);
 EF=NaN(kmax,1);
 
-options=optimset('MaxIter', 1e3, 'MaxFun', 1e3, 'TolX', 1e-3, 'TolFun', 1e-3, 'Display', 'off');
-
-for ii = 1:kmax
+% loop through the desired end members
+for ii = kmin:kmax
     
-    if ii > 1
-        Init(1:ii-1,:) = Intial{ii-1};
+    % Get the HALS-NMF solution
+    [tmp_EM, tmp_Abunds] = HALS_NMF(X, ii, 5e3, 1e1);
+    
+    % Sort the EMs by their mean abundances
+    [~, Sinds] = sortrows(mean(tmp_Abunds)', -1);
+    tmp_EM = tmp_EM(Sinds,:);
+    
+    % Get the EM gradients
+    dE = gradient(tmp_EM);
+    
+    % Get the number of stationary points for each row
+    Stat_pts = diff(sign(dE), [], 2);
+    Stat_pts(tmp_EM(:,1:end-1) < 0.01) = 0; % Set stat pts with low density to zero
+    
+    
+    % loop through the end members to identify stationary points
+    tmp_sorted = [];
+    tmp_sorted2 = [];
+    
+    for jj = 1:ii
+        SP = Stat_pts(jj,:);
+        
+        % Process the maxima
+        Pos2Neg_inds = find(SP==-2);
+        
+        tmp_X = mean([tmp_EM(jj,Pos2Neg_inds)', tmp_EM(jj,Pos2Neg_inds+1)'], 2);
+        tmp_GS = mean([LGS(Pos2Neg_inds), LGS(Pos2Neg_inds+1)], 2);
+        
+        % Sort the details by normalized frequency so the first row
+        % corresponds to the most prevalant component
+        tmp_sorted = [tmp_sorted; sortrows([tmp_X, tmp_GS, abs([tmp_GS(1)/4; diff(tmp_GS)/4]), Pos2Neg_inds' ], -1) ]; %#ok<AGROW>
+        
+        % Process the minima
+        Neg2Pos_inds = find(SP==2);
+        
+        if ~isempty(Neg2Pos_inds)
+            tmp_X2 = mean([tmp_EM(jj,Neg2Pos_inds)', tmp_EM(jj,Neg2Pos_inds+1)'], 2);
+            tmp_GS2 = mean([LGS(Neg2Pos_inds), LGS(Neg2Pos_inds+1)], 2);
+            
+            tmp_sorted2 = [tmp_sorted2; sortrows([tmp_X2, tmp_GS2, abs([tmp_GS2(1)/4; diff(tmp_GS2)/4]), Neg2Pos_inds' ], -1) ]; %#ok<AGROW>
+        end
+        
     end
     
-    [Params, fval(ii), EF(ii)]=fminsearchbnd(@(z) Unmix_Para_EMs(I_data, GS, ii, Fit_Type, z, 'Projection'), Init(1:ii,:), Lower(1:ii,:), Upper(1:ii,:), options);
-    Intial(ii) = {Params};
+    n = size(tmp_sorted, 1);
     
+    if n < ii
+        
+        % Take the details and tag on the minima. This is for cases where the
+        % number of desired end members is greater than the number of maxima
+        tmp_sorted = [tmp_sorted; tmp_sorted2]; %#ok<AGROW>
+    end
+    
+    n = size(tmp_sorted, 1);
+    
+    
+    % Get the inital paramter guesses
+    %
+    % Find the grain size bins that are zero for all EMs
+    NZi = sum(tmp_EM==0)~=ii;
+    NZi_Lims = [find(LGS == min(LGS(NZi))), find(LGS == max(LGS(NZi)))]; % Grain size indices for start and end points
+    
+    switch Fit_Type
+        
+        case 'Lognormal'
+            Init = [tmp_sorted(:,2), tmp_sorted(:,3)];
+            
+            % Catch cases where there are fewer stationary points than desired end members
+            if n < ii
+                Init(n+1:ii,:) = repmat( mean([Lower(1,:); Upper(1,:)]), ii-n, 1);
+            end
+                        
+        case 'Gen. Weibull'
+                        
+            % For k (Bhat) >= 2, lambda (Ahat) is approximately the mode,
+            % but less the first non-zero index for a general Weibull
+            Ahat = tmp_sorted(:,4) - NZi_Lims(1);
+            Bhat = Ahat./2; %A hat/2 since for most good fits Bhat < Ahat, but > 2
+            Bhat(Bhat<2) = 2;
+            
+            mu = NZi_Lims(1).*ones(size(Ahat));
+                        
+            Init = [Ahat, Bhat, mu ];
+            
+            if n < ii
+                Init(n+1:ii,:) = repmat( [Ahat(1), Bhat(1), NZi_Lims(1)], ii-n, 1);
+            end
+                        
+        case 'Weibull'
+            
+            % For k (Bhat) >= 2, lambda (Ahat) is approximately the mode
+            % approximate only if k >= 2
+            Ahat = tmp_sorted(:,4);
+            Bhat = Ahat./2; % Ahat/2 since for most good fits Bhat < Ahat, but > 2
+            Bhat(Bhat<2) = 2;
+            
+            Init = [Ahat, Bhat];
+            
+            if n < ii
+                % Spread any extra initial estiamtes evenly
+                kleft = ii-n;
+                Steps = ( NZi_Lims(2) - NZi_Lims(1) ) / kleft;
+                
+                Ahat = NZi_Lims(1) + Steps.*(1:kleft);
+                Bhat = Ahat./2;
+                Bhat(Bhat<2) = 2;
+                
+                Init(n+1:ii,:) = [Ahat', Bhat'];
+            end
+            
+        case 'SGG'
+            
+            Init = [tmp_sorted(:,2), tmp_sorted(:,3), 0.99.*ones(n,1)];
+            % Start with a small skewness (q = 0.99) to avoid starting on
+            % the upper boundary
+            
+            if n < ii
+                Init(n+1:ii,:) = repmat( [mean(tmp_sorted(:,2)), mean(tmp_sorted(:,3)), 0.99 ], ii-n, 1);
+            end
+            
+        case 'GEV'
+            
+            Init = [tmp_sorted(:,2), tmp_sorted(:,3), zeros(n, 1)];
+            
+            if n < ii
+                Init(n+1:ii,:) = repmat( [mean([Lower(1,2:end); Upper(1,2:end)]), 0 ], ii-n, 1);
+            end
+            
+    end
+    
+    % Do an intial fitting search to get a more precise initial esimate        
+    [Params, fval(ii), EF(ii)]=fminsearchbnd(@(z) Unmix_Para_EMs(tmp_EM, GS, ii, Fit_Type, z, 'Projection'), Init(1:ii,:), Lower(1:ii,:), Upper(1:ii,:), options);
+    Initial(ii) = {Params};
+
 end
+
+% Turn the warning back on
+warning('on', 'MATLAB:rankDeficientMatrix');
 
 % toc

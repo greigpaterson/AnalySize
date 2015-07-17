@@ -250,7 +250,7 @@ set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);% set(get(newAxes, 'Children'), 'MarkerSize', 6);
 
-NewPos = [1.5, 1.5, 5, 5];
+NewPos = [1.5, 1.5, 4.5, 4.5];
 set(newAxes, 'Position', NewPos);
 
 print(tmpFig, '-depsc', strcat(path, file));
