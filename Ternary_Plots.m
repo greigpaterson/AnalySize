@@ -241,6 +241,16 @@ set(handles.Tern_Axes, 'Xlim', [-0.05, 1.05], 'YLim', [-0.05, 0.935]);
 
 
 function Pcts = Get_GS_Fractions(handles)
+%
+% Divide the data in to clay, silt, sand, and gravel
+%
+
+% some machines do not measure upto -1 phi
+sand_lim = -1;
+if min(handles.Phi) > -1
+    sand_lim = min(handles.Phi);
+end
+
 
 % The data cumulative sum
 CS = handles.Data_CumSum;
@@ -248,8 +258,8 @@ CS = handles.Data_CumSum;
 % The precentages
 clay_pct = interp1(handles.Phi, CS', 8)';
 silt_pct = interp1(handles.Phi, CS', 4)' - clay_pct;
-sand_pct = interp1(handles.Phi, CS', -1)' - interp1(handles.Phi, CS', 4)';
-gravel_pct = 1-interp1(handles.Phi, CS', -1)';
+sand_pct = interp1(handles.Phi, CS', sand_lim)' - interp1(handles.Phi, CS', 4)';
+gravel_pct = 1-interp1(handles.Phi, CS', sand_lim)';
 gravel_pct(gravel_pct<1e-6) = 0; % remove rounding errors
 
 Pcts = [clay_pct, silt_pct, sand_pct, gravel_pct];
