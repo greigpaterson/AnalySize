@@ -46,45 +46,48 @@ Try = 0;
 while Try <= 1e2
     try
         % project using all k components and original data
-        [Ud, ~, ~] = svds(X*X'/nData, k);  % projection matrix
+        [Ud, ~, ~] = svds(X*X'/nData, k);  % projection matrix ([1] algorithm line 4)
         Xp =  Ud' * X;
         
         M = Ud * Xp; % The mixing matrix [nVar x nData]
         
-        Y= Xp ./ repmat( sum(Xp.*repmat(mean(Xp,2), 1, nData)), k, 1);
+        Y = Xp ./ repmat( sum(Xp.*repmat(mean(Xp,2), 1, nData)), k, 1); % ([1] algorithm line 6)
         break
     catch
-%         disp('Caught an SVDS errror')
         Try = Try + 1;
     end
 end
 
 %% The Main loop
 
-% The auxiliary matrix
+% Initialize the auxiliary matrix ([1] algorithm line 14)
 Am = zeros(k, k);
 Am(k, 1) = 1;
 
-Inds = NaN(k,1);
-
+% Random matirx ([1] algorithm line 16)
 W = rand(k,k);
-% W = mvnrnd(ones(k,1), eye(k), k)';
+
+% Matrix for storing the specimen indices
+Inds = NaN(k,1);
 
 for ii = 1:k
     
-    w = W(:,ii);
+    % Isolate a random vector
+    w = W(:,ii); 
     
-    f = w - Am*pinv(Am)*w;
+    % [1] algorithm lines 17-18
+    f = w - Am*pinv(Am)*w; % Note - eye(k)*w = w
     f = f./norm(f);
     v = f'*Y;
     
+    % Find the index of the extreme value
     [~, Inds(ii)] = max( abs(v) );
     
+    % Update the auxiliary matrix 
     Am(:,ii) = Y(:,Inds(ii));
         
 end
 
 
-% The endmember signature
-% nEnd x nVar
+% The endmember signature - transposed to be nEnd x nVar
 A = M(:,Inds)';

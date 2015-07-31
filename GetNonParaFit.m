@@ -37,13 +37,14 @@ Spec_R2 = NaN(nData, EM_Max);
 Min_Spec_R2 = NaN(EM_Max, 1);
 EM_R2 = NaN(EM_Max,1);
 Spec_Angle = NaN(nData, EM_Max);
-Mean_Angle = NaN(EM_Max, 1);
+DataSet_Angle = NaN(EM_Max, 1);
+% Convexity_Error = NaN(EM_Max, 1);
 
 Stored_Xprime = cell(EM_Max, 1); % for storing the abundance
 Stored_EMs = cell(EM_Max, 1); % for storing the end members
 Stored_Abunds = cell(EM_Max, 1); % for storing the abundance
 
-% tic
+tic
 % Set up a waitbar to count the loop
 h = waitbar(0,'Initializing....', 'Name', 'Calculating end member fits...',...
     'CreateCancelBtn', 'setappdata(gcbf,''Cancelled'',1)');
@@ -62,7 +63,85 @@ for k=EM_Min:EM_Max
     % Update the waitbar and continue
     waitbar((k-1)/(EM_Max), h, strcat('Fitting ', sprintf(' %d', k), ' end members....'))
     
-    [tmp_EM, tmp_Abunds, Xprime] = HALS_NMF(X, k, 5e3, 1e1);
+    [tmp_EM, tmp_Abunds, Xprime] = HALS_NMF(X, k, 5e3, 10, [5, 0, 0, 0], 0);
+        
+    Convexity = GetConvexityError(X, tmp_EM);
+    
+if jj ~=1 && Convexity <= -8
+            % k = 1 is perfectly convex so skip this case
+            
+            % Increase minimum distance too ensure convexity is not too low
+            % This makes the fit robust to outliers
+            MaxIter = 1e2;
+            All_b2 = NaN(MaxIter, 1);
+            All_convexity = NaN(MaxIter, 1);
+            All_b2(1) = 0;
+            All_convexity(1) = Convexity;
+            
+            b2_low = All_b2(1);
+            C_low = All_convexity(1);
+            b2_hi = [];
+            C_hi = [];
+            
+            iter = 2;
+            b2 = 0.4;
+            
+            while iter < MaxIter
+                
+                [HALS_EMs, HALS_Abunds, HALS_Xprime] = HALS_NMF(tmp_Data, jj, 5e3, 10, [5, 0, 0, b2], 0);
+                Convexity = GetConvexityError(tmp_Data, HALS_EMs);
+                
+                disp(['jj=', num2str(jj), '; iter=', num2str(iter), '; b2 = ', num2str(b2), '; C = ', num2str(Convexity)]);
+                
+                
+                All_b2(iter) = b2;
+                All_convexity(iter) = Convexity;
+                
+                
+                if iter > MaxIter
+                    break;
+                elseif Convexity <= -6 && Convexity > -8
+                    break;
+                end
+                
+                % update b2 for the next iter
+                
+                if Convexity <= -8 && Convexity > C_low
+                    % New esimate pushes convexity in the right direction,
+                    % but is still to low
+                    % Update the lower limits
+                    b2_low = b2;
+                    C_low = Convexity;
+                end
+                
+                if ~isempty(b2_hi) && Convexity > -6
+                    % our latest estimate is high, so compare but with
+                    % existing upper bounds
+                    if Convexity < C_hi % We are closer to desired upp limit
+                        b2_hi = b2;
+                        C_hi = Convexity;
+                    end
+                end
+                
+                if isempty(b2_hi) && Convexity > -6
+                    % our latest estimate has jumped right across our bounds
+                    % but we have no upper limits
+                    b2_hi = b2;
+                    C_hi = Convexity;
+                end
+                
+                if ~isempty(b2_hi)
+                    b2_pts = [b2_low, b2_hi];
+                    C_pts = [C_low, C_hi];                    
+                    b2 = interp1(C_pts, b2_pts, -7, 'linear', 'extrap');
+                else
+                    % we have no upper bound so just double the current b2
+                    b2 = 2*b2;
+                end
+                iter = iter + 1;
+            end
+        end
+
     
     % Sort the EMs
     [tmp_EM, Sinds] = sortEMs(tmp_EM, GS, 'Median');
@@ -76,7 +155,9 @@ for k=EM_Min:EM_Max
     R2(k) = GetR2(Xprime(:), X(:));
     Spec_R2(:, k) = GetR2(X', Xprime')';
     Min_Spec_R2(k) = min( Spec_R2(:, k) );
-    [Spec_Angle(:,k), Mean_Angle(k)]  = GetAngles(X, Xprime);
+    DataSet_Angle(k) = GetAngles(X(:), Xprime(:));
+    Spec_Angle(:,k)  = GetAngles(X, Xprime);
+%     Convexity_Error(k) = GetConvexityError(X, tmp_EM);
     
     if k >1
         r = GetR2(tmp_EM');
@@ -92,7 +173,7 @@ for k=EM_Min:EM_Max
 end
 
 delete(h)
-% toc
+toc
 
 
 if Cancel_Flag == 1
@@ -106,11 +187,12 @@ end
 % Get the selected number of end members
 Transfer.DataSet_R2 = R2;
 Transfer.Spec_R2 = Spec_R2;
-Transfer.Mean_Angle = Mean_Angle;
+Transfer.DataSet_Angle = DataSet_Angle;
 Transfer.Spec_Angle = Spec_Angle;
 Transfer.EM_Min = EM_Min;
 Transfer.EM_Max = EM_Max;
 Transfer.EM_R2 = EM_R2;
+% Transfer.Convexity = Convexity_Error;
 
 Return = Select_EndMembers('DataTransfer', Transfer);
 Cancel_Flag = Return.Cancel_Flag;
@@ -133,11 +215,13 @@ Abunds = Stored_Abunds{Selected_EM};
 % Recalculate the fit quality stats
 R2 = GetR2(Xprime(:), X(:));
 Spec_R2 = GetR2(X', Xprime')';
-[Spec_Angle, Mean_Angle]  = GetAngles(X, Xprime);
+DataSet_Angle = GetAngles(X(:), Xprime(:));
+Spec_Angle  = GetAngles(X, Xprime);
+
 r = GetR2(EMs');
 r = r - diag(diag(r));
 EM_R2 = max(max(r.^2));
 
-Fit_Quality = {[R2, Mean_Angle, EM_R2], [Spec_R2, Spec_Angle]};
+Fit_Quality = {[R2, DataSet_Angle, EM_R2], [Spec_R2, Spec_Angle]};
 
-
+% toc

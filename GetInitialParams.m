@@ -88,7 +88,7 @@ EF=NaN(kmax,1);
 for ii = kmin:kmax
     
     % Get the HALS-NMF solution
-    [tmp_EM, tmp_Abunds] = HALS_NMF(X, ii, 5e3, 1e1);
+    [tmp_EM, tmp_Abunds] = HALS_NMF(X, ii, 5e3, 10);
     
     % Sort the EMs by their mean abundances
     [~, Sinds] = sortrows(mean(tmp_Abunds)', -1);
@@ -114,7 +114,7 @@ for ii = kmin:kmax
         
         tmp_X = mean([tmp_EM(jj,Pos2Neg_inds)', tmp_EM(jj,Pos2Neg_inds+1)'], 2);
         tmp_GS = mean([LGS(Pos2Neg_inds), LGS(Pos2Neg_inds+1)], 2);
-        
+%         keyboard
         % Sort the details by normalized frequency so the first row
         % corresponds to the most prevalant component
         tmp_sorted = [tmp_sorted; sortrows([tmp_X, tmp_GS, abs([tmp_GS(1)/4; diff(tmp_GS)/4]), Pos2Neg_inds' ], -1) ]; %#ok<AGROW>

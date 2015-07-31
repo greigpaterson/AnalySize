@@ -46,6 +46,8 @@ end
 
 R2 = GetR2(Xprime(:), X(:));
 Spec_R2 = GetR2(X', Xprime')';
-[Spec_Angle, Mean_Angle]  = GetAngles(X, Xprime);
+DataSet_Angle = GetAngles(X(:), Xprime(:));
+Spec_Angle  = GetAngles(X, Xprime);
 
-Fit_Quality = {[R2, Mean_Angle], [Spec_R2, Spec_Angle]};
+
+Fit_Quality = {[R2, DataSet_Angle], [Spec_R2, Spec_Angle]};

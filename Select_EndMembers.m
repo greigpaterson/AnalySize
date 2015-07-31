@@ -83,7 +83,7 @@ set(hObject, 'Position', [newX, newY, newW, newH]);
 % Get the data from previous window
 handles.DataSet_R2 = DataTransfer.DataSet_R2;
 handles.Spec_R2 = DataTransfer.Spec_R2;
-handles.Mean_Angle = DataTransfer.Mean_Angle;
+handles.DataSet_Angle = DataTransfer.DataSet_Angle;
 handles.Spec_Angle = DataTransfer.Spec_Angle;
 handles.EM_Max = DataTransfer.EM_Max;
 handles.EM_Min = DataTransfer.EM_Min;
@@ -116,7 +116,7 @@ end
 plot(handles.Var_Axes, 0, 0, '-r')
 plot(handles.Var_Axes, 0, 0, '-xb', 'MarkerEdgeColor', [1,0,0])
 hold(handles.Var_Axes, 'off')
-Plot_BoxWhisker(handles.Var_Axes, handles.Spec_R2)
+Plot_BoxWhisker(handles.Var_Axes, handles.Spec_R2, 'L')
 
 set(handles.Var_Axes, 'Xlim', [0, handles.EM_Max+1], 'YLim', [0.3, 1.01]);
 if ~isempty(handles.EM_R2)
@@ -132,12 +132,12 @@ set(get(handles.Var_Axes, 'Title'), 'String', 'Linear Correlations', 'FontUnits'
 
 
 % Update the angular dev plot
-plot(handles.Angle_Axes, handles.Mean_Angle, '-ok', 'LineWidth', 2)
+plot(handles.Angle_Axes, handles.DataSet_Angle, '-ok', 'LineWidth', 2)
 hold(handles.Angle_Axes, 'on')
 plot(handles.Angle_Axes, -1, 0, '-r')
 plot(handles.Angle_Axes, -1, 0, '-xb', 'MarkerEdgeColor', [1,0,0])
 hold(handles.Angle_Axes, 'off')
-Plot_BoxWhisker(handles.Angle_Axes, handles.Spec_Angle)
+Plot_BoxWhisker(handles.Angle_Axes, handles.Spec_Angle, 'U')
 
 set(handles.Angle_Axes, 'Xlim', [0, handles.EM_Max+1], 'YLim', [0, 15]);
 hleg = legend(handles.Angle_Axes, 'Mean Angle', 'Specimen median', 'Specimen box & whisker', 'Location', 'NorthEast');
@@ -146,6 +146,7 @@ set(hleg, 'FontUnits', FUnits, 'FontSize', FontSize3);
 set(get(handles.Angle_Axes, 'XLabel'), 'String', 'Number of end members', 'FontUnits', FUnits, 'FontSize', FontSize1);
 set(get(handles.Angle_Axes, 'YLabel'), 'String', 'Angle (degrees)', 'FontUnits', FUnits, 'FontSize', FontSize1);
 set(get(handles.Angle_Axes, 'Title'), 'String', 'Angular Deviation', 'FontUnits', FUnits, 'FontSize', FontSize2);
+
 
 % update the default selection and labels
 set(handles.Selected_EM, 'Value', handles.EM_Min, 'String', sprintf('%d', handles.EM_Min));
@@ -271,14 +272,29 @@ function Set_Var_Levels(handles)
 
 ind = get(handles.Selected_EM, 'Value');
 
+% keyboard
+
+% Get the values for the 2.5 and 97.5 percentiles
+nData = size(handles.Spec_R2,1);
+CDF = (0:nData-1)./(nData-1);
+i95 = [find(CDF < 0.95, 1, 'last'), find(CDF > 0.95, 1, 'first')];
+
+tmp_sorted = 100.*sort(handles.Spec_R2(:,ind), 'descend');
+R95 = interp1(CDF(i95), tmp_sorted(i95), 0.95);
+
+tmp_sorted = sort(handles.Spec_Angle(:,ind), 'ascend');
+A95 = interp1(CDF(i95), tmp_sorted(i95), 0.95);
+
+% keyboard
+
 set(handles.Label_EM, 'String', sprintf('%d', ind) );
 set(handles.Label_Var1, 'String', sprintf('%3.1f', 100.*handles.DataSet_R2(ind)) );
 set(handles.Label_Var2, 'String', sprintf('%3.1f', median(100.*handles.Spec_R2(:,ind)) ) );
-set(handles.Label_Var3, 'String', sprintf('%3.1f', min(100.*handles.Spec_R2(:,ind)) ) );
+set(handles.Label_Var3, 'String', sprintf('%3.1f', R95 ) );
 
-set(handles.Label_Ang1, 'String', sprintf('%3.1f', handles.Mean_Angle(ind)) );
+set(handles.Label_Ang1, 'String', sprintf('%3.1f', handles.DataSet_Angle(ind)) );
 set(handles.Label_Ang2, 'String', sprintf('%3.1f', median(handles.Spec_Angle(:,ind)) ) );
-set(handles.Label_Ang3, 'String', sprintf('%3.1f', max(handles.Spec_Angle(:,ind)) ) );
+set(handles.Label_Ang3, 'String', sprintf('%3.1f', A95 ) );
 
 if ~isempty(handles.EM_R2)
     set(handles.Label_EM_R2, 'String', sprintf('%3.3f', handles.EM_R2(ind)));

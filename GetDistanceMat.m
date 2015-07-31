@@ -1,6 +1,6 @@
 function Z = GetDistanceMat(X)
 % 
-% Function that returns the distance matrix of X
+% Function that returns the (unsquared) distance matrix of X
 %
 
 [n, p] = size(X);

@@ -4,8 +4,7 @@ function [EMs, Sinds] = sortEMs(EMs, GS, Type)
 %
 
 if nargin < 3
-    Type = 'Median';
-    
+    Type = 'Median';   
 end
 
 k = size(EMs, 1);

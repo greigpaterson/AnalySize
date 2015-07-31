@@ -1,4 +1,4 @@
-function [EMs, Abunds, Xprime] = HALS_NMF(X, k, MaxIter, Reps, Verbose)
+function [EMs, Abunds, Xprime] = HALS_NMF(X, k, MaxIter, Reps, Regs, Verbose)
 %
 % Determines the nonnegative matrix factors of X using the Hierarchical
 % Alternating Least-Squares (HALS) algorithm with flexible constriants
@@ -10,6 +10,7 @@ function [EMs, Abunds, Xprime] = HALS_NMF(X, k, MaxIter, Reps, Verbose)
 %       k - The number of componets in the factor matrices
 %       MaxIter - the maximum number of iterations
 %       Reps - The number of repetitions of the iterative routine
+%       Regs - 4 x 1 matrix of constraint regularizers [a1, a2, b1, b2]
 %
 % Outputs:
 %         EMs - k x nVar matrix of end member vectors
@@ -43,30 +44,40 @@ end
 
 if nargin < 3
     MaxIter = 1e3;
-    Reps = 1;
 end
 
 if nargin < 4
-    Reps = 1;
+    Reps = 10;
 end
 
 if nargin < 5
+    Regs = [5, 0, 0, 0];
+end
+
+if nargin < 6
     Verbose = 0;
 end
 
 % Tolerances for stopping
-eps = 1e-10;
+eps = 1e-6;
 sqrteps = sqrt(eps);
 TolX = eps;
 TolFun = eps;
 
+
+% Suppress singular matrix warnings
+% This affects very low noise data sets that are over-fitted
+% Gernerally, this is synthetic data sets
+warning('off', 'MATLAB:singularMatrix');
+
+
 %% The main function
 
 % The regularization parameters
-a1 = 5; % Sum-to-one constraint on abundances
-a2 = 0; % Maximum spatial dispersion constraint
-b1 = 0; % Minimum spectral disperison constraint
-b2 = 0; % Minimum distance constraint
+a1 = Regs(1); % Sum-to-one constraint on abundances
+a2 = Regs(2); % Maximum spatial dispersion constraint
+b1 = Regs(3); % Minimum spectral disperison constraint
+b2 = Regs(4); % Minimum distance constraint
 
 % preallocate for speed
 final_resid = NaN(Reps, 1);
@@ -84,9 +95,9 @@ for Rep_ind = 1:Reps
     % The above S & A convention follows that given by [1], but is opposite to
     % what is frequently used in the literature
     
-    % VCA initialization
-    A0 = GetVCA(X, k);
-    A0 = abs(A0); % Absolute value
+    % SISAL initialization
+    A0 = SISAL(X, k);
+    A0(A0<0) = 0; % Remove negative values
     A0 = A0./repmat(sum(A0,2), 1,nVar);% Sum-to-one
     S0 = Get_FCLS(X, A0); % use FCLS to get the initial abundances
     
@@ -116,11 +127,7 @@ for Rep_ind = 1:Reps
             
             Sk = (Ak'*Xk + a1* (ones(1,nData) - S_sum ) - (a2/k)*ones(1,nData) )...
                 ./ ( norm(Ak, 'fro').^2 + a1 - a2 );
-            
-            % Sum to one constraint only
-%             Sk = (Ak'*Xk + a1* (ones(1,nData) - S_sum ))...
-%                 ./ ( norm(Ak, 'fro').^2 + a1 );
-            
+                        
             % Update Sk with the maximum function and add to S
             Sk(Sk > 1) = 1;
             Sk = max(0, Sk);
@@ -132,9 +139,6 @@ for Rep_ind = 1:Reps
             Ak = ( Xk*Sk' + (b2/k)*(1-1/k)*(eye(nVar) - ones(nVar)./nVar)*A_sum )'...
                 / ( norm(Sk, 'fro').^2*eye(nVar) + (eye(nVar) - ones(nVar)./nVar) * (b1+b2*(1-1/k)^2) );
             
-            % sum to one constaint only
-%             Ak = (Xk*Sk')' / (norm(Sk, 'fro').^2*eye(nVar));
-
             Ak = Ak'; % The above adds a transpose the numerator and uses matrix division
             
             % Update Ak with the maximum function and add to A
@@ -199,6 +203,10 @@ Abunds = Get_FCLS(X, EMs);
 % Get the estimated data and redo sum to one to remove rounding errors
 Xprime = Abunds*EMs;
 Xprime = Xprime./repmat(sum(Xprime,2), 1,nVar);
+
+
+% Turn the warnings back on
+warning('on', 'MATLAB:singularMatrix');
 
 
 %% OUTPUT CHECK FOR TESTING

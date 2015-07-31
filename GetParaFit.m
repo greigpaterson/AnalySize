@@ -77,7 +77,7 @@ if Flag == 0
     Min_Spec_R2 = NaN(EM_Max, 1);
     EM_R2 = NaN(EM_Max,1);
     Spec_Angle = NaN(nData, EM_Max);
-    Mean_Angle = NaN(EM_Max, 1);
+    DataSet_Angle = NaN(EM_Max, 1);
     
     Stored_Params=cell(EM_Max, 1); % for storing the parameters
     
@@ -138,7 +138,8 @@ if Flag == 0
         R2(k) = GetR2(Xprime(:), X(:));
         Spec_R2(:, k) = GetR2(X', Xprime')';
         Min_Spec_R2(k) = min( Spec_R2(:, k) );
-        [Spec_Angle(:,k), Mean_Angle(k)]  = GetAngles(X, Xprime);
+        DataSet_Angle(k) = GetAngles(X(:), Xprime(:));
+        Spec_Angle(:,k)  = GetAngles(X, Xprime);
         
         if k >1
             r = GetR2(tmp_EM');
@@ -173,7 +174,7 @@ if Flag == 0
     % Get the selected number of end members
     Transfer.DataSet_R2 = R2;
     Transfer.Spec_R2 = Spec_R2;
-    Transfer.Mean_Angle = Mean_Angle;
+    Transfer.DataSet_Angle = DataSet_Angle;
     Transfer.Spec_Angle = Spec_Angle;
     Transfer.EM_Min = EM_Min;
     Transfer.EM_Max = EM_Max;
@@ -215,11 +216,13 @@ end
 Xprime = Abunds*EMs;
 R2 = GetR2(Xprime(:), X(:));
 Spec_R2 = GetR2(X', Xprime')';
-[Spec_Angle, Mean_Angle]  = GetAngles(X, Xprime);
+DataSet_Angle = GetAngles(X(:), Xprime(:));
+Spec_Angle  = GetAngles(X, Xprime);
+
 r = GetR2(EMs');
 r = r - diag(diag(r));
 EM_R2 = max(max(r.^2));
 
-Fit_Quality = {[R2, Mean_Angle, EM_R2], [Spec_R2, Spec_Angle]};
+Fit_Quality = {[R2, DataSet_Angle, EM_R2], [Spec_R2, Spec_Angle]};
 
 

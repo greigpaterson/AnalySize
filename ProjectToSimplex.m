@@ -114,7 +114,7 @@ for ii = 1:nEnd
     inds = [1:ii-1, ii+1:nEnd];
     C = [D(inds, inds), ones(nEnd-1, 1); ones(1, nEnd-1), 0]; % Eqn 23
     
-    Vol(ii) = sqrt( ( (-1)^(nEnd+1) / (2^nEnd * factorial(nEnd)^2 ) )  * det(C) );
+    Vol(ii) = sqrt( ( (-1)^(nEnd) / (2^(nEnd-1) * factorial(nEnd-1)^2 ) )  * det(C) );
     % Note, this is not exactly eqn 22, but an alternative formulation from
     % MathWorld http://mathworld.wolfram.com/Cayley-MengerDeterminant.html
     

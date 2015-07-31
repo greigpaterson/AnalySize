@@ -217,37 +217,17 @@ if Fit_Ind ~= 0
     handles.Specimen_QFit = handles.All_Specimen_QFit{1, Fit_Ind};
     handles.DataSet_QFit = handles.All_DataSet_QFit{1, Fit_Ind};
     
-    if strcmpi(handles.Current_Fit_Type(1:3), 'SSU')
-        
-        % Get the maximum number of endmembers
-        Sizes = cell2mat(cellfun(@size,handles.All_Fit_EMs{1,Fit_Ind}, 'UniformOutput', 0));
-        handles.nEnd = max(Sizes(:,1));
-        
-        handles.Current_Fit_EMs = handles.All_Fit_EMs{1,Fit_Ind}{spec_ind};
-        handles.Current_Fit_Abunds = handles.All_Fit_Abunds{1,Fit_Ind}{spec_ind};
-        handles.Current_Fit_Params = handles.All_Fit_Params{1,Fit_Ind}{spec_ind};
-        
-        % Get the abunds without NaNs
-        tmp_abunds = handles.Current_Fit_Abunds(~isnan(handles.Current_Fit_Abunds));
-        
-        handles.Current_Fit_PDFs = tmp_abunds * handles.Current_Fit_EMs;
-        
-        handles.Current_Specimen_Fit = repmat(tmp_abunds, handles.nVar,1)'.*handles.Current_Fit_EMs;
-               
-        Table_Abunds = 100.*cell2mat(handles.All_Fit_Abunds{1,Fit_Ind});
-        
-    else
-        handles.Current_Fit_EMs = handles.All_Fit_EMs{1,Fit_Ind};
-        handles.Current_Fit_Abunds = handles.All_Fit_Abunds{1,Fit_Ind};
-        handles.Current_Fit_Params = handles.All_Fit_Params{1,Fit_Ind};
-        
-        handles.Current_Fit_PDFs = handles.Current_Fit_Abunds(spec_ind,:) * handles.Current_Fit_EMs;
-        handles.Current_Specimen_Fit = repmat(handles.Current_Fit_Abunds(handles.spec_ind,:), handles.nVar, 1)'.*handles.Current_Fit_EMs;
-        handles.nEnd = size(handles.Current_Fit_EMs, 1);
-        
-        Table_Abunds = 100.*handles.Current_Fit_Abunds;
-    end
-        
+    
+    handles.Current_Fit_EMs = handles.All_Fit_EMs{1,Fit_Ind};
+    handles.Current_Fit_Abunds = handles.All_Fit_Abunds{1,Fit_Ind};
+    handles.Current_Fit_Params = handles.All_Fit_Params{1,Fit_Ind};
+    
+    handles.Current_Fit_PDFs = handles.Current_Fit_Abunds(spec_ind,:) * handles.Current_Fit_EMs;
+    handles.Current_Specimen_Fit = repmat(handles.Current_Fit_Abunds(handles.spec_ind,:), handles.nVar, 1)'.*handles.Current_Fit_EMs;
+    handles.nEnd = size(handles.Current_Fit_EMs, 1);
+    
+    Table_Abunds = 100.*handles.Current_Fit_Abunds;
+    
 end
 
 % Update the plots
@@ -841,107 +821,17 @@ if Fit_Opt_Return.FitStatus == 1
     % Set the current fit data
     func_handles = Set_Current_Fit(handles);
     handles = func_handles;
+
+    % Get the 95th percentiles for R^2 and theta
+    nData = handles.Nspec;
+    R2_95 = GetPercentile([0,diff(0:nData-1)], sort(handles.Specimen_QFit(:,1), 'descend')', 95);
+    Theta_95 = GetPercentile([0,diff(0:nData-1)], sort(handles.Specimen_QFit(:,2), 'descend')', 5);
+    
     
     % Set the table data
     handles.Fit_Table_Data = [handles.Fit_Table_Data;...
         {handles.Current_Fit_Type}, {handles.nEnd}, {handles.DataSet_QFit(3)}, {handles.DataSet_QFit(1)}, {handles.DataSet_QFit(2)},...
-        {min(handles.Specimen_QFit(:,1))}, {max(handles.Specimen_QFit(:,2))}];
-    
-    set(handles.Fit_Table, 'Data', handles.Fit_Table_Data);
-    
-    guidata(hObject, handles);
-    
-end % else do nothing (keep the old plots and fit)
-
-guidata(hObject, handles);
-
-
-% --- Executes on button press in Do_EMA_BS.
-function Do_EMA_BS_Callback(hObject, eventdata, handles)
-% hObject    handle to Do_EMA_BS (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-%
-% THIS IS NOT A PRIMARY FUNCTION AND IS DESIGNED FOR TESTING ONLY
-% THIS SHOULD NOT BE ENABLED
-%
-% if handles.Data_Loaded == 0
-%      warndlg('No data currently loaded.', 'No Data', 'modal')
-%     return
-% end
-%
-% if handles.FitStatus == 0 || strcmpi(handles.Current_Fit_Type(1:3), 'Non') || strcmpi(handles.Current_Fit_Type(1:3), 'SSU')
-%          warndlg('A parametric EMA fit must be selected.', 'Incorrect fit', 'modal')
-%     return
-% end
-%
-%
-% % warndlg('Well done you are here. Now do something!', 'Congratulations!!', 'modal')
-%
-% Fit_Ind = handles.Fit_Data_Ind;
-%
-% Data = cell2mat(handles.All_Data);
-% GS = handles.Current_GS;
-% Fit_Type = handles.Current_Fit_Type;
-% EMA_Fits = handles.All_Fit_EMs{Fit_Ind};
-% EMA_Fit_Params = handles.Current_Fit_Params;
-%
-%
-%
-% [BS_EMs, BS_Params, fval, EF] = BootstrapEMA(Data, GS, Fit_Type, EMA_Fits, EMA_Fit_Params);
-%
-% keyboard
-warndlg('This feature is not activated.', 'Inactive function.', 'modal')
-
-% --- Executes on button press in Do_SSU.
-function Do_SSU_Callback(hObject, eventdata, handles)
-% hObject    handle to Do_SSU (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-try
-    % Send the data to the maui GUI figure
-    setappdata(handles.AnalySize_MW, 'Data_To_Fit', cell2mat(handles.All_Data) );
-    setappdata(handles.AnalySize_MW, 'Size', handles.All_GS{1});
-catch
-    warndlg('No data currently loaded.', 'No Data', 'modal')
-    return
-end
-
-% Load the fit options
-SSU_Opt_Return = SSU_Options('Main_Window_Call', handles.AnalySize_MW);
-
-
-if SSU_Opt_Return.FitStatus == 1
-    
-    % Set the handle fit status
-    handles.FitStatus = SSU_Opt_Return.FitStatus;
-    handles.Plot_Fits_Flag = 1; % Set the plot fit flag
-    
-    % Process the fit data
-    handles.All_Fit_EMs = [handles.All_Fit_EMs, {SSU_Opt_Return.EndMembers}];
-    handles.All_Fit_Abunds = [handles.All_Fit_Abunds, {SSU_Opt_Return.Abundances}];
-    
-    handles.All_Fit_Params = [handles.All_Fit_Params, {SSU_Opt_Return.Dist_Params}];
-    
-    handles.All_Fit_N = handles.All_Fit_N + 1; % Add 1 to the counter for the number of saved fits
-    handles.Fit_Data_Ind = handles.All_Fit_N;% set the fit data index to move to the current fit
-    
-    handles.All_DataSet_QFit = [handles.All_DataSet_QFit, SSU_Opt_Return.Fit_Quality(1)];
-    handles.All_Specimen_QFit = [handles.All_Specimen_QFit, SSU_Opt_Return.Fit_Quality(2)];
-    
-    handles.All_Fit_Types = [handles.All_Fit_Types, {char(SSU_Opt_Return.Fit_Type)}];
-    
-    
-    % Set the current fit data
-    func_handles = Set_Current_Fit(handles);
-    handles = func_handles;
-    
-    % Set the table data
-    handles.Fit_Table_Data = [handles.Fit_Table_Data;...
-        {handles.Current_Fit_Type}, {handles.nEnd}, {handles.DataSet_QFit(3)}, {handles.DataSet_QFit(1)}, {handles.DataSet_QFit(2)},...
-        {min(handles.Specimen_QFit(:,1))}, {max(handles.Specimen_QFit(:,2))}];
+        {R2_95}, {Theta_95}];
     
     set(handles.Fit_Table, 'Data', handles.Fit_Table_Data);
     
@@ -1141,259 +1031,138 @@ if handles.FitStatus == 0
     return;
 else
     
-    if strcmpi(handles.Current_Fit_Type(1:3), 'SSU')
+    % Do the EMA files
+    [EM_file,EM_path] = uiputfile('End_Member_Densities.dat','Export the end member data...');
+    [A_file,A_path] = uiputfile('End_Member_Abundances.dat','Export the abundance data...');
+    
+    D_file = 0;
+    if ~strcmpi(handles.Current_Fit_Type, 'Non-Parametric')
+        [D_file,D_path] = uiputfile('End_Member_Distribution_Params.dat','Export the parameter data...');
+    end
+    
+    if ~ischar(EM_file) && EM_file==0
+        % User has cancelled the EM file
+        EM_Out = 0;
+    else
+        EM_Out = 1;
+    end
+    
+    if ~ischar(A_file) && A_file==0
+        % User has cancelled the EM file
+        A_Out = 0;
+    else
+        A_Out = 1;
+    end
+    
+    if ~ischar(D_file) && D_file==0
+        % User has cancelled the EM file
+        D_Out = 0;
+    else
+        D_Out = 1;
+    end
+    
+    if EM_Out == 0 && A_Out == 0 && D_Out == 0
+        % User has cancelled everything, so do nothing and return
+        return;
+    end
+    
+    % Write the endmember file
+    if EM_Out == 1
         
-        Fit_ind = handles.Fit_Data_Ind;
-        spec_ind = handles.spec_ind;
-        Name = char(handles.All_Names(spec_ind));
+        EM_out_file = fopen(strcat(EM_path, EM_file), 'wt');
         
-        [EM_file,EM_path] = uiputfile(strcat(Name, '_End_Member_Densities.dat'),'Export the end member data...');
-        [D_file,D_path] = uiputfile('End_Member_Abunds_Params.dat','Export the parameter data...');
+        % The format string for printing the data
+        fmt = '%2.5f\t%2.5f\t%2.5f';
+        Data_Out = [handles.Current_GS, handles.Current_LGS, handles.Current_Phi];
         
+        fprintf(EM_out_file, '%s\t%s\t%s', 'Grain size', 'ln(Grain size)', 'Phi');
         
-        if ~ischar(EM_file) && EM_file==0
-            % User has cancelled the EM file
-            EM_Out = 0;
-        else
-            EM_Out = 1;
+        Header = [{'Grain size'}, {'ln(Grain size)'}, {'Phi'}];
+        
+        % Get the EM Fits
+        EM_Fits = 100.*handles.Current_Fit_EMs;
+        
+        nFits = handles.nEnd;
+        
+        for ii = 1: nFits
+            fmt = strcat(fmt, '\t%2.5f');
+            Data_Out(:,end+1) = EM_Fits(ii,:)';
+            fprintf(EM_out_file, '\t%s', strcat('EM', sprintf('% d', ii)));
+            Header = [Header, {strcat('EM', sprintf('% d', ii))}];
         end
         
+        fprintf(EM_out_file, handles.Line_End);
         
-        if ~ischar(D_file) && D_file==0
-            % User has cancelled the EM file
-            D_Out = 0;
-        else
-            D_Out = 1;
-        end
+        fmt = strcat(fmt, handles.Line_End);
         
-        if EM_Out == 0 && D_Out == 0
-            % User has cancelled everything, so do nothing and return
-            return;
-        end
+        fprintf(EM_out_file, fmt, Data_Out');
         
-        
-        % Write the endmember file
-        if EM_Out == 1
-            EM_out_file = fopen(strcat(EM_path, EM_file), 'wt');
-            
-            fmt = '%2.5f\t%2.5f\t%2.5f';
-            Data_Out = [handles.Current_GS, handles.Current_LGS, handles.Current_Phi];
-            
-            fprintf(EM_out_file, '%s\t%s\t%s', 'Grain size', 'ln(Grain size)', 'Phi');
-            
-            Header = [{'Grain size'}, {'ln(Grain size)'}, {'Phi'}];
-            
-            % Get the EM Fits
-            EM_Fits = 100.*handles.Current_Fit_EMs;
-            
-            nFits = size(EM_Fits, 1);
-            
-            for ii = 1: nFits
-                fmt = strcat(fmt, '\t%2.5f');
-                Data_Out(:,end+1) = EM_Fits(ii,:)';
-                fprintf(EM_out_file, '\t%s', strcat('EM', sprintf('% d', ii)));
-                Header = [Header, {strcat('EM', sprintf('% d', ii))}];
-            end
-            
-            fprintf(EM_out_file, handles.Line_End);
-            
-            fmt = strcat(fmt, handles.Line_End);
-            
-            fprintf(EM_out_file, fmt, Data_Out');
-            
-            fclose(EM_out_file);
-        end
-        
-        
-        % Write the distribution paramter file
-        if D_Out == 1
-            
-            D_out_file = fopen(strcat(D_path, D_file), 'wt');
-            
-            D = handles.All_Fit_Params{1,Fit_ind};
-            A = handles.All_Fit_Abunds{1,Fit_ind};
-            nData = size(D, 1);
-            nFits = handles.nEnd;
-            
-            Sizes = cell2mat(cellfun(@size, D, 'UniformOutput', 0));
-            nParams = unique(Sizes(:,2));
-            if length(nParams) > 1
-                error('AnalySize:Export_EM_Data', 'The number of fit parameters is not constant.');
-            end
-            
-            Data_Out = NaN(nData, nFits + nFits*nParams);
-            
-            for ii = 1:nData
-                Params = D{ii};
-                nEnd = size(Params,1);
-                Abunds = 100.*A{ii};
-                if nEnd < nFits
-                    Data_Out(ii,:) = [reshape(Abunds', 1, numel(Abunds)),...
-                        reshape(Params', 1, numel(Params)), NaN(1, nParams*(nFits-nEnd)) ];
-                else
-                    Data_Out(ii,:) = [reshape(Abunds', 1, numel(Abunds)), reshape(Params', 1, numel(Params))];
-                end
-            end
-            
-            
-            fmt = '%s\t%s\t%f\t%f';
-            fprintf(D_out_file, '%s\t%s\t%s\t%s', 'Specimen', 'Fit Type', 'R^2', 'Theta');
-            for ii = 1:nFits
-                fprintf(D_out_file, '\t%s', strcat('EM', sprintf('% d ', ii), ' Abunds') );
-                fmt = strcat(fmt, '\t%f');
-            end
-            for ii = 1:nFits
-                for jj = 1:nParams
-                    fprintf(D_out_file, '\t%s', strcat('EM', sprintf('% d ', ii), ' Param ', sprintf('% d', jj)) );
-                    fmt = strcat(fmt, '\t%f');
-                end
-            end
-            
-            
-            fmt = strcat(fmt, handles.Line_End);
-            fprintf(D_out_file, handles.Line_End);
-            
-            
-            Data_Out = [handles.All_Names, repmat({handles.Current_Fit_Type}, nData, 1), num2cell(handles.Specimen_QFit), num2cell(Data_Out)]';
-            fprintf(D_out_file, fmt, Data_Out{:});
-            
-            fclose(D_out_file);
-            
-        end
-                
-    else % Do the EMA files
-        [EM_file,EM_path] = uiputfile('End_Member_Densities.dat','Export the end member data...');
-        [A_file,A_path] = uiputfile('End_Member_Abundances.dat','Export the abundance data...');
-        
-        D_file = 0;
-        if ~strcmpi(handles.Current_Fit_Type, 'Non-Parametric')
-            [D_file,D_path] = uiputfile('End_Member_Distribution_Params.dat','Export the parameter data...');
-        end
-        
-        if ~ischar(EM_file) && EM_file==0
-            % User has cancelled the EM file
-            EM_Out = 0;
-        else
-            EM_Out = 1;
-        end
-        
-        if ~ischar(A_file) && A_file==0
-            % User has cancelled the EM file
-            A_Out = 0;
-        else
-            A_Out = 1;
-        end
-        
-        if ~ischar(D_file) && D_file==0
-            % User has cancelled the EM file
-            D_Out = 0;
-        else
-            D_Out = 1;
-        end
-        
-        if EM_Out == 0 && A_Out == 0 && D_Out == 0
-            % User has cancelled everything, so do nothing and return
-            return;
-        end
-        
-        % Write the endmember file
-        if EM_Out == 1
-            
-            EM_out_file = fopen(strcat(EM_path, EM_file), 'wt');
-            
-            % The format string for printing the data
-            fmt = '%2.5f\t%2.5f\t%2.5f';
-            Data_Out = [handles.Current_GS, handles.Current_LGS, handles.Current_Phi];
-            
-            fprintf(EM_out_file, '%s\t%s\t%s', 'Grain size', 'ln(Grain size)', 'Phi');
-            
-            Header = [{'Grain size'}, {'ln(Grain size)'}, {'Phi'}];
-            
-            % Get the EM Fits
-            EM_Fits = 100.*handles.Current_Fit_EMs;
-            
-            nFits = handles.nEnd;
-            
-            for ii = 1: nFits
-                fmt = strcat(fmt, '\t%2.5f');
-                Data_Out(:,end+1) = EM_Fits(ii,:)';
-                fprintf(EM_out_file, '\t%s', strcat('EM', sprintf('% d', ii)));
-                Header = [Header, {strcat('EM', sprintf('% d', ii))}];
-            end
-            
-            fprintf(EM_out_file, handles.Line_End);
-            
-            fmt = strcat(fmt, handles.Line_End);
-            
-            fprintf(EM_out_file, fmt, Data_Out');
-            
-            fclose(EM_out_file);
-                        
-        end
-        
-        % Write the abundace file
-        if A_Out == 1
-            
-            A_out_file = fopen(strcat(A_path, A_file), 'wt');
-            
-            % The format string for printing the data
-            fmt = '%s\t%2.5f\t%2.5f';
-            Data_Out = [handles.All_Names, num2cell(handles.Specimen_QFit)];
-            
-            fprintf(A_out_file, '%s\t%s\t%s', 'Specimen', 'R^2', 'Theta');
-            
-            nFits = handles.nEnd;
-            
-            for ii = 1: nFits
-                fmt = strcat(fmt, '\t%2.5f');
-                Data_Out(:,end+1) = num2cell(100.*handles.Current_Fit_Abunds(:,ii)); %#ok<AGROW>
-                fprintf(A_out_file, '\t%s', strcat('EM', sprintf('% d', ii)));
-            end
-            
-            fprintf(A_out_file, handles.Line_End);
-            
-            fmt = strcat(fmt, handles.Line_End);
-            
-            Data_Out = Data_Out';
-            
-            fprintf(A_out_file, fmt, Data_Out{:});
-            
-            fclose(A_out_file);
-            
-        end
-        
-        % Write the distribution paramter file
-        if D_Out == 1
-            
-            D_out_file = fopen(strcat(D_path, D_file), 'wt');
-            
-            Params = handles.Current_Fit_Params;
-            [nFits, nParams] = size(Params);
-            
-            % Write the Header line
-            fprintf(D_out_file, '%s', handles.Current_Fit_Type);
-            for ii =1 :nParams
-                fprintf(D_out_file, '\t%s', strcat('Param', sprintf('% d', ii)));
-            end
-            fprintf(D_out_file, handles.Line_End);
-            
-            Data_Out = cell(nFits, 1);
-            fmt = '';
-            for ii = 1:nFits
-                Data_Out(ii) = {strcat('EM', sprintf('% d', ii) ) };
-                fmt = strcat(fmt, '%s', repmat('\t%f', 1, nParams-1), strcat('\t%f', handles.Line_End) );
-            end
-            
-            Data_Out = [Data_Out, num2cell(Params)];
-            Data_Out = Data_Out';
-            
-            fprintf(D_out_file, fmt, Data_Out{:});
-            
-            fclose(D_out_file);
-            
-        end
+        fclose(EM_out_file);
         
     end
+    
+    % Write the abundace file
+    if A_Out == 1
+        
+        A_out_file = fopen(strcat(A_path, A_file), 'wt');
+        
+        % The format string for printing the data
+        fmt = '%s\t%2.5f\t%2.5f';
+        Data_Out = [handles.All_Names, num2cell(handles.Specimen_QFit)];
+        
+        fprintf(A_out_file, '%s\t%s\t%s', 'Specimen', 'R^2', 'Theta');
+        
+        nFits = handles.nEnd;
+        
+        for ii = 1: nFits
+            fmt = strcat(fmt, '\t%2.5f');
+            Data_Out(:,end+1) = num2cell(100.*handles.Current_Fit_Abunds(:,ii)); %#ok<AGROW>
+            fprintf(A_out_file, '\t%s', strcat('EM', sprintf('% d', ii)));
+        end
+        
+        fprintf(A_out_file, handles.Line_End);
+        
+        fmt = strcat(fmt, handles.Line_End);
+        
+        Data_Out = Data_Out';
+        
+        fprintf(A_out_file, fmt, Data_Out{:});
+        
+        fclose(A_out_file);
+        
+    end
+    
+    % Write the distribution paramter file
+    if D_Out == 1
+        
+        D_out_file = fopen(strcat(D_path, D_file), 'wt');
+        
+        Params = handles.Current_Fit_Params;
+        [nFits, nParams] = size(Params);
+        
+        % Write the Header line
+        fprintf(D_out_file, '%s', handles.Current_Fit_Type);
+        for ii =1 :nParams
+            fprintf(D_out_file, '\t%s', strcat('Param', sprintf('% d', ii)));
+        end
+        fprintf(D_out_file, handles.Line_End);
+        
+        Data_Out = cell(nFits, 1);
+        fmt = '';
+        for ii = 1:nFits
+            Data_Out(ii) = {strcat('EM', sprintf('% d', ii) ) };
+            fmt = strcat(fmt, '%s', repmat('\t%f', 1, nParams-1), strcat('\t%f', handles.Line_End) );
+        end
+        
+        Data_Out = [Data_Out, num2cell(Params)];
+        Data_Out = Data_Out';
+        
+        fprintf(D_out_file, fmt, Data_Out{:});
+        
+        fclose(D_out_file);
+        
+    end
+    
 end
 
 
@@ -1618,7 +1387,27 @@ function MB_Load_Session_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Load the saved session
-handles = LoadSession(handles);
+
+[file,path] = uigetfile('*.mat','Load a saved session...');
+
+if ~ischar(file) && file==0
+    % User has cancelled
+    % Do nothing and...
+    return;
+end
+
+
+try
+    load(strcat(path, file), 'Session_handles');
+catch
+    % Warn about invalid mat files and return
+    warndlg('This is not a valid session file. Please try another.', 'Invalid files');
+    return;
+end
+
+
+handles = LoadSession(handles, Session_handles);
+
 
 % Update the data, fits, and plots
 handles = Set_Current_Data(handles);
@@ -1685,7 +1474,7 @@ catch
     return;
 end
 
-Descriptive_Stats('DataTransfer', Transfer, handles.AnalySize_MW, 0);
+Descriptive_Stats('DataTransfer', Transfer, handles.AnalySize_MW);
 
 
 % --------------------------------------------------------------------
@@ -1732,24 +1521,13 @@ try
     
     Transfer.Names = Names;
     
-    SSU_Flag = 0;
-    SSU_EMs = [];
-    SSU_Names = [];
-    if strcmpi(handles.Current_Fit_Type(1:3), 'SSU')
-        SSU_Flag = 1;
-        Fit_ind = handles.Fit_Data_Ind;
-        SSU_EMs = handles.All_Fit_EMs{Fit_ind};
-        SSU_Names = handles.All_Names;
-    end
-    
-    
 catch
     warndlg('Error finding end member fits.', 'No end members', 'modal')
     return;
 end
 
 
-Descriptive_Stats('DataTransfer', Transfer, handles.AnalySize_MW, SSU_Flag, SSU_EMs, SSU_Names);
+Descriptive_Stats('DataTransfer', Transfer, handles.AnalySize_MW);
 
 
 % --------------------------------------------------------------------
