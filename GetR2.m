@@ -1,7 +1,8 @@
 function R2 = GetR2(X, Y)
 %
-% function to determine the Pearson linear correlation between two input
+% function to determine the squared Pearson linear correlation between two input
 % vector, X and Y
+%
 
 corrXX = 0; % cross-correlation flag
 if nargin == 1

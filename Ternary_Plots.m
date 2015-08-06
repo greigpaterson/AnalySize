@@ -199,27 +199,20 @@ newAxes = copyobj(handles.Tern_Axes, tmpFig);
 
 NewMarkerSize = handles.Symbol_Size./2;
 
-if handles.Version < 8.4
-    
-    % Reset the line widths
-    C = get(newAxes, 'Children');
-%     keyboard
-    for ii = 1: length(C);
-        try %#ok<TRYNC>
-            set(C(ii),'MarkerSize',NewMarkerSize);
-        end
+% Reset the marker sizes
+C = get(newAxes, 'Children');
+for ii = 1: length(C);
+    try %#ok<TRYNC>
+        set(C(ii),'MarkerSize',NewMarkerSize);
     end
-    
-else
-    % TODO update for 2014b graphics
 end
+
 
 % Reduce the font size a little
 TextObjs = findobj(newAxes, 'Type', 'Text');
 set(TextObjs, 'FontUnits', 'Points', 'FontSize', FontSize);
 
 set(newAxes, 'Units', 'Centimeters')
-% OldPos = get(newAxes, 'Position');
 NewPos = [BaseX, BaseY, 8, sqrt(8^2-4^2)];
 set(newAxes, 'Position', NewPos);
 

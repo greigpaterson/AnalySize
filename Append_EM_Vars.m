@@ -21,7 +21,7 @@ Global_Max = max(Old.EM_Max, New.EM_Max);
 % Create a structure with empty arrays/cells of the correct size
 Data.DataSet_R2 = NaN(Global_Max, 1);
 Data.Spec_R2 = NaN(nData, Global_Max);
-Data.Mean_Angle = NaN(Global_Max, 1);
+Data.DataSet_Angle = NaN(Global_Max, 1);
 Data.Spec_Angle= NaN(nData, Global_Max);
 Data.EM_R2 = NaN(Global_Max, 1);
 Data.EM_Min = 1;
@@ -34,7 +34,7 @@ Inds = Old.EM_Min:Old.EM_Max; % indices to access the old data
 
 Data.DataSet_R2(Inds) = Old.DataSet_R2(Inds);
 Data.Spec_R2(:, Inds) = Old.Spec_R2(:,Inds);
-Data.Mean_Angle(Inds) = Old.Mean_Angle(Inds);
+Data.Mean_Angle(Inds) = Old.DataSet_Angle(Inds);
 Data.Spec_Angle(:, Inds)= Old.Spec_Angle(:,Inds);
 Data.EM_R2(Inds) = Old.EM_R2(Inds);
 Data.Params(Inds) = Old.Params(Inds);
@@ -45,7 +45,7 @@ Inds = New.EM_Min:New.EM_Max; % indices to access the old data
 
 Data.DataSet_R2(Inds) = New.DataSet_R2(Inds);
 Data.Spec_R2(:, Inds) = New.Spec_R2(:,Inds);
-Data.Mean_Angle(Inds) = New.Mean_Angle(Inds);
+Data.DataSet_Angle(Inds) = New.DataSet_Angle(Inds);
 Data.Spec_Angle(:, Inds)= New.Spec_Angle(:,Inds);
 Data.EM_R2(Inds) = New.EM_R2(Inds);
 Data.Params(Inds) = New.Params(Inds);

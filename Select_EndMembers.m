@@ -355,7 +355,6 @@ set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 
-% OldPos = get(newAxes, 'Position');
 NewPos = [1.5, 1.5, PlotSize, PlotSize];
 set(newAxes, 'Position', NewPos);
 A1P1 = NewPos(1);
@@ -371,26 +370,21 @@ set(get(newAxes2, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes2, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes2, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 
-% OldPos = get(newAxes2, 'Position');
 NewPos = [A1P1 + PlotSize+1.5, 1.5, PlotSize, PlotSize];
 set(newAxes2, 'Position', NewPos);
 
-if handles.Version < 8.4
-    
-    % Reset the line widths
-    C = get(newAxes, 'Children');
-    for ii = 1: length(C);
-        set(C(ii),'LineWidth',1);
-    end
-    
-    C = get(newAxes2, 'Children');
-    for ii = 1: length(C);
-        set(C(ii),'LineWidth',1);
-    end
-    
-else
-    % TODO update for 2014b graphics
+
+% Reset the line widths
+C = get(newAxes, 'Children');
+for ii = 1: length(C);
+    set(C(ii),'LineWidth',1);
 end
+
+C = get(newAxes2, 'Children');
+for ii = 1: length(C);
+    set(C(ii),'LineWidth',1);
+end
+
 
 print(tmpFig, '-depsc', strcat(path, file));
 close(tmpFig);

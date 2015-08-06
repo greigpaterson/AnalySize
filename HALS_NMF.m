@@ -58,7 +58,7 @@ if nargin < 6
     Verbose = 0;
 end
 
-% Tolerances for stopping
+% Tolerances for stopping (N.B. these are relative tolerances)
 eps = 1e-6;
 sqrteps = sqrt(eps);
 TolX = eps;

@@ -928,7 +928,6 @@ else
     % Set the legend and adjust it's properties
     legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'off', 'FontUnits', 'Points', 'FontSize', 8);
 end
-set(hleg, 'Box', 'off')
 
 % Reset to the desired size
 NewPos = [1.5, 1.5, 4.5, 4.5];

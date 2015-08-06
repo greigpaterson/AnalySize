@@ -2,7 +2,7 @@ function ConvErr = GetConvexityError(X, EMs)
 %
 % Calculate the convexity error given in [1]
 %
-% Input?
+% Input:
 %       X - nData x nVar matrix of observations
 %       EMs - nEnd x nVar matirx of end member signatures
 %
@@ -38,7 +38,7 @@ Aneg(Aneg > 0) = 0;
 Prop = sum( max(Aneg < 0, [],2)==1 )./nData;
 
 % Get the mean squared distance of negative values
-Aneg(sum(Aneg >= 0, 2)==0, :) = []; % remove the postive only rows
+Aneg(sum(Aneg >= 0, 2)==0, :) = []; % remove the postive only rows so that they don't bias the mean
 Dist = mean(sum(Aneg.^2, 2));
 
 ConvErr = log10(Prop) + log10(Dist);
