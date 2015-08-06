@@ -44,7 +44,7 @@ Stored_Xprime = cell(EM_Max, 1); % for storing the abundance
 Stored_EMs = cell(EM_Max, 1); % for storing the end members
 Stored_Abunds = cell(EM_Max, 1); % for storing the abundance
 
-tic
+% tic
 % Set up a waitbar to count the loop
 h = waitbar(0,'Initializing....', 'Name', 'Calculating end member fits...',...
     'CreateCancelBtn', 'setappdata(gcbf,''Cancelled'',1)');
@@ -52,7 +52,7 @@ setappdata(h,'Cancelled',0)
 Cancel_Flag = 0;
 
 
-for k=EM_Min:EM_Max
+for k = EM_Min:EM_Max
     
     % Check for Cancel button press
     if getappdata(h,'Cancelled')
@@ -63,83 +63,10 @@ for k=EM_Min:EM_Max
     % Update the waitbar and continue
     waitbar((k-1)/(EM_Max), h, strcat('Fitting ', sprintf(' %d', k), ' end members....'))
     
-    [tmp_EM, tmp_Abunds, Xprime] = HALS_NMF(X, k, 5e3, 10, [5, 0, 0, 0], 0);
+    tmp_EM = HALS_NMF(X, k, 5e3, 10, [5, 0, 0, 0], 0);
     
-    Convexity = GetConvexityError(X, tmp_EM);
-    
-    % Check the convexity
-    % define some params for the b2 search
-    MaxIter = 1e2;
-    Clim1 = -8; % low convexity limit
-    Clim2 = -6; % upper convexity limit
-    
-    if jj ~=1 && Convexity <= Clim1
-        % Increase minimum distance too ensure convexity is not too low
-        % This makes the fit robust to outliers
-        % k = 1 is perfectly convex so skip this case
-        
-        % Low and upper values for the update
-        b2_low = 0;
-        C_low = Convexity;
-        b2_hi = [];
-        C_hi = [];
-        
-        iter = 2; % Current iteration count
-        b2 = 0.4; % New b2 value - relatively large in the hope to ge C > -6 and establish a bound
-        
-        while iter < MaxIter
-            
-            [tmp_EMs, tmp_Abunds, Xprime] = HALS_NMF(tmp_Data, jj, 5e3, 10, [5, 0, 0, b2], 0);
-            Convexity = GetConvexityError(tmp_Data, tmp_EMs);
-            
-            if iter > MaxIter
-                warning('GetNoParaFit:Find_b2', 'Maximum iterations exceeded. This is unexpected, please let Greig Paterson know.');
-                break;
-            elseif Convexity <= Clim2 && Convexity > Clim1
-                break;
-            end
-            
-            % update b2 for the next iter
-            
-            if Convexity <= Clim1 && Convexity > C_low
-                % New esimate pushes convexity in the right direction,
-                % but is still to low
-                % Update the lower limits
-                b2_low = b2;
-                C_low = Convexity;
-            end
-            
-            if ~isempty(b2_hi) && Convexity > Clim2
-                % our latest estimate is high, so compare with existing upper bounds
-                if Convexity < C_hi
-                    % We are closer to desired upper limit, so update
-                    b2_hi = b2;
-                    C_hi = Convexity;
-                end
-            end
-            
-            if isempty(b2_hi) && Convexity > Clim2
-                % our latest estimate has jumped right across our
-                % bounds, but we have no upper limits, so set them
-                b2_hi = b2;
-                C_hi = Convexity;
-            end
-            
-            if ~isempty(b2_hi)
-                % we have both upper and lower bounds
-                % So interpolate between them and aim for a b2 value
-                % that is in the middle of the convexity limits
-                b2_pts = [b2_low, b2_hi];
-                C_pts = [C_low, C_hi];
-                b2 = interp1(C_pts, b2_pts, (Clim1+Clim2)/2, 'linear', 'extrap');
-            else
-                % we have no upper bound so just double the current b2
-                b2 = 2*b2;
-            end
-            
-            iter = iter + 1;
-        end % end of the while loop
-    end %  jj ~=1 && Convexity <= Clim1
+    % Check convexity and adjust b2 if needed
+    [tmp_EM, tmp_Abunds, Xprime, Convexity] = Find_b2(X, tmp_EM);
     
     
     % Sort the EMs
@@ -172,7 +99,7 @@ for k=EM_Min:EM_Max
 end
 
 delete(h)
-toc
+% toc
 
 
 if Cancel_Flag == 1
