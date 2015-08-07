@@ -325,7 +325,23 @@ axis(newAxes, 'square');
 
 PlotSize = 4.5;
 
+% Adjust the figure
+set(newAxes, 'FontUnits', 'Points', 'FontSize', 9, 'Units', 'Centimeters')
+set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
+set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
+set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
+% Adjust size
+NewPos = [1.5, 1.5, PlotSize, PlotSize];
+set(newAxes, 'Position', NewPos);
+A1P1 = NewPos(1);
 
+% Reset the line widths
+C = get(newAxes, 'Children');
+for ii = 1: length(C);
+    set(C(ii),'LineWidth',1);
+end
+
+% Do legend
 hleg1 = legend(newAxes, 'Data set', 'EM correlation', 'Specimen median', 'Specimen box & whisker', 'Location', 'SouthEast');
 set(hleg1, 'FontUnits', 'Points', 'FontSize', 7, 'Box', 'off',...
     'Units', 'Centimeters', 'Position', [12.5, 4, 4, 2]);
@@ -349,17 +365,6 @@ set(hleg1, 'FontUnits', 'Points', 'FontSize', 7, 'Box', 'off',...
 % end
 
 
-% Adjust the figure
-set(newAxes, 'FontUnits', 'Points', 'FontSize', 9, 'Units', 'Centimeters')
-set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
-set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
-set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
-
-NewPos = [1.5, 1.5, PlotSize, PlotSize];
-set(newAxes, 'Position', NewPos);
-A1P1 = NewPos(1);
-
-
 %% Do the second axes
 newAxes2=copyobj(handles.Angle_Axes, tmpFig);
 axis(newAxes2, 'square')
@@ -375,11 +380,6 @@ set(newAxes2, 'Position', NewPos);
 
 
 % Reset the line widths
-C = get(newAxes, 'Children');
-for ii = 1: length(C);
-    set(C(ii),'LineWidth',1);
-end
-
 C = get(newAxes2, 'Children');
 for ii = 1: length(C);
     set(C(ii),'LineWidth',1);

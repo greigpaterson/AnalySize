@@ -261,14 +261,14 @@ FontSize2 = 14; % 14pt font
 switch Plot_Type
     case 1 % Log Scale
         Xplot=handles.Current_LGS;
-        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'ok');
+        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'ok', 'LineWidth', 1);
         set(get(handles.PDF_Axes, 'XLabel'), 'String', 'Ln(grain size in \mu{m})', 'FontUnits', FUnits, 'FontSize', FontSize1);
         set(get(handles.PDF_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
         set(get(handles.PDF_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
         
     case 2 % Log-Linear Scale
         Xplot=handles.Current_GS;
-        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'ok');
+        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'ok', 'LineWidth', 1);
         set(handles.PDF_Axes, 'XScale', 'Log');
         set(get(handles.PDF_Axes, 'XLabel'), 'String', 'Grain size [\mu{m}]', 'FontUnits', FUnits, 'FontSize', FontSize1)
         set(get(handles.PDF_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
@@ -276,7 +276,7 @@ switch Plot_Type
         
     case 3 % Phi scale
         Xplot=handles.Current_Phi;
-        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'ok');
+        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'ok', 'LineWidth', 1);
         set(get(handles.PDF_Axes, 'XLabel'), 'String', '\phi', 'FontUnits', FUnits, 'FontSize', FontSize1)
         set(get(handles.PDF_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
         set(get(handles.PDF_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
@@ -313,7 +313,7 @@ if Plot_Fits==1
     cla(handles.EM_Axes, 'reset'); % Reset the axes
     set(handles.EM_Axes, 'ColorOrder', handles.Default_Plot_Colors);
     hold(handles.EM_Axes, 'on')
-    plot(handles.EM_Axes, Xplot, 100.*handles.Current_Fit_EMs, 'LineWidth', 1)%, 'Color', handles.Default_Plot_Colors(1:4,:))
+    plot(handles.EM_Axes, Xplot, 100.*handles.Current_Fit_EMs, 'LineWidth', 1)
     hold(handles.EM_Axes, 'off')
     
     set(get(handles.EM_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
@@ -878,6 +878,11 @@ set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 
+% set(get(newAxes, 'Title'), 'Units', 'Centimeters');
+% TOP = get(get(newAxes, 'Title'), 'Position'); % Title Old Position
+
+
+% keyboard
 
 % Do the legend
 Legend_String = {'Data'};
@@ -969,6 +974,12 @@ else
     set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
     set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
     set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
+    
+    % Reset the line widths
+    C = get(newAxes, 'Children');
+    for ii = 1: length(C);
+        set(C(ii),'LineWidth',1);
+    end
     
     
     % Do the legends
