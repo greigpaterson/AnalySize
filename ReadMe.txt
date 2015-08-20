@@ -4,8 +4,16 @@ If users encounter bugs or problems using AnalySize, or have any suggestions for
 
 More information on the unmixing algorithms used in AnalySize can be found in Paterson & Heslop (2015). Details on how to use AnalySize are provided in the instruction manual packaged with AnalySize.
 
+
 Greig A. Paterson (greig.paterson "at" mail.iggcas.ac.cn)
 Institute of Geology & Geophysics, Chinese Academy of Science, Beijing, China.
 
 David Heslop
 Australian National University, Canberra, Australia.
+
+
+
+Brief Version History:
+(See the instruction manual for full details)
+
+v0.9 - Initial version submitted during publication review.
