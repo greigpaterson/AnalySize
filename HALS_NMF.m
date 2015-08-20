@@ -51,7 +51,7 @@ if nargin < 4
 end
 
 if nargin < 5
-    Regs = [5, 0, 0, 0];
+    Regs = [5, 0];
 end
 
 if nargin < 6
@@ -75,9 +75,7 @@ warning('off', 'MATLAB:singularMatrix');
 
 % The regularization parameters
 a1 = Regs(1); % Sum-to-one constraint on abundances
-a2 = Regs(2); % Maximum spatial dispersion constraint
-b1 = Regs(3); % Minimum spectral disperison constraint
-b2 = Regs(4); % Minimum distance constraint
+b2 = Regs(2); % Minimum distance constraint
 
 % preallocate for speed
 final_resid = NaN(Reps, 1);
@@ -87,28 +85,20 @@ All_S = cell(Reps, 1);
 for Rep_ind = 1:Reps
     
     % Initialize the matrices
-    % X are data (nVar x nData)
-    % S are EM adundances (nEnd x nData)
-    % A are endmembers (nVar x nEnd)
-    
-    % NOTE
-    % The above S & A convention follows that given by [1], but is opposite to
-    % what is frequently used in the literature
-    
+    % X is the data (nData nVar)
+    % A is teh EM adundances (nData x nEnd)
+    % S is the endmembers (nEnd x nVar)
+        
     % SISAL initialization
-    A0 = SISAL(X, k);
-    A0(A0<0) = 0; % Remove negative values
-    A0 = A0./repmat(sum(A0,2), 1,nVar);% Sum-to-one
-    S0 = Get_FCLS(X, A0); % use FCLS to get the initial abundances
-    
-    % Transpose to fit with algorithm convention
-    A0 = A0';
-    S0 = S0';
-    
+    S0 = SISAL(X, k);
+    S0(S0<0) = 0; % Remove negative values
+    S0 = S0./repmat(sum(S0,2), 1,nVar);% Sum-to-one
+    A0 = Get_FCLS(X, S0); % use FCLS to get the initial abundances
+        
     % Assign the inital values to new matrices that are updated over the
     % iterations
-    S = S0;
     A = A0;
+    S = S0;
     
     % Store the residuals for each iteration
     tmp_resid = NaN(MaxIter, 1);
@@ -120,42 +110,42 @@ for Rep_ind = 1:Reps
             % Get the Sk, Ak, and Xk vectors
             Sk = S(k_ind, :);
             Ak = A(:, k_ind);
-            Xk = X' - A*S + Ak*Sk;
+            Xk = X - A*S + Ak*Sk;
             
-            % Update Sk
+                         
+           % Update Sk, the end members
             S_sum = sum(S,1) - Sk;
             
-            Sk = (Ak'*Xk + a1* (ones(1,nData) - S_sum ) - (a2/k)*ones(1,nData) )...
-                ./ ( norm(Ak, 'fro').^2 + a1 - a2 );
-                        
+            Sk = (Ak'*Xk + ( (b2/k)*(1-1/k)*(eye(nVar) - ones(nVar)./nVar)*S_sum' )' )...
+                / (norm(Ak).^2*eye(nVar) + b2.*(eye(nVar) - ones(nVar)./nVar) .* (1-1/k)^2) ;
+            
             % Update Sk with the maximum function and add to S
             Sk(Sk > 1) = 1;
             Sk = max(0, Sk);
+            Sk = Sk./sum(Sk); % Renormalize to sum to one
             S(k_ind,:) = Sk;
-                        
-            % Update Ak
+            
+            
+            % Update Ak, the abundaces
             A_sum = sum(A,2) - Ak;
-                                    
-            Ak = ( Xk*Sk' + (b2/k)*(1-1/k)*(eye(nVar) - ones(nVar)./nVar)*A_sum )'...
-                / ( norm(Sk, 'fro').^2*eye(nVar) + (eye(nVar) - ones(nVar)./nVar) * (b1+b2*(1-1/k)^2) );
+
+            Ak = (Xk*Sk' + a1.*(ones(nData,1) - A_sum) ) ./ (norm(Sk).^2 + a1);
             
-            Ak = Ak'; % The above adds a transpose the numerator and uses matrix division
-            
-            % Update Ak with the maximum function and add to A
+            % Update Sk with the maximum function and add to S
             Ak(Ak > 1) = 1;
             Ak = max(0, Ak);
-            A(:, k_ind) = Ak;
-            
+            A(:,k_ind) = Ak;
+                        
         end
         
         % tolerance check
         % if changes are too small break out
-        tmp_resid(Iter_ind) =  norm( (A*S)-X','fro');
+        tmp_resid(Iter_ind) =  norm( (A*S)-X,'fro');
         
         if Iter_ind > 1
             
-            dA = max(max(abs(A-A0) / (sqrteps+max(max(abs(A0))))));
-            dS = max(max(abs(S-S0) / (sqrteps+max(max(abs(S0))))));
+            dA = max(max(abs(A-S0) / (sqrteps+max(max(abs(S0))))));
+            dS = max(max(abs(S-A0) / (sqrteps+max(max(abs(A0))))));
             delta = max(dA, dS);
             
             if delta <= TolX %
@@ -172,15 +162,15 @@ for Rep_ind = 1:Reps
                 final_resid(Rep_ind) = tmp_resid(Iter_ind);
                 All_S(Rep_ind) = {S};
                 All_A(Rep_ind) = {A};
-                break
+                break;
             end
             
         end
         
         % Update the old values
-        A0 = A;
-        S0 = S;
-
+        S0 = A;
+        A0 = S;
+        
     end
     
 end
@@ -193,7 +183,7 @@ S = All_S{Min_ind};
 
 
 % Assign to the output variables and redo sum to one to remove rounding errors
-EMs = A';
+EMs = S;
 EMs = EMs./repmat(sum(EMs,2), 1,nVar);
 
 % Apply FCLS to ensure all constraints are met
@@ -208,14 +198,13 @@ Xprime = Xprime./repmat(sum(Xprime,2), 1,nVar);
 % Turn the warnings back on
 warning('on', 'MATLAB:singularMatrix');
 
-
 %% OUTPUT CHECK FOR TESTING
 
 if Verbose == 1
-    Max_EM_Sum = max(abs(1-sum(A)));
-    Max_Abund_Sum = max(abs(1-sum(S,1)));
+    Max_EM_Sum = max(abs(1-sum(S,2)));
+    Max_Abund_Sum = max(abs(1-sum(A,2)));
     
-    Xprime_Orig = S'*A';
+    Xprime_Orig = A*S;
     
     N1 = norm(X-Xprime_Orig, 'fro');
     N2 = norm(X-Xprime, 'fro');

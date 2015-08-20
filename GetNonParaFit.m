@@ -63,7 +63,7 @@ for k = EM_Min:EM_Max
     % Update the waitbar and continue
     waitbar((k-1)/(EM_Max), h, strcat('Fitting ', sprintf(' %d', k), ' end members....'))
     
-    tmp_EM = HALS_NMF(X, k, 5e3, 10, [5, 0, 0, 0], 0);
+    tmp_EM = HALS_NMF(X, k, 5e3, 10, [5, 0], 0);
     
     % Check convexity and adjust b2 if needed
     [tmp_EM, tmp_Abunds, Xprime, Convexity] = Find_b2(X, tmp_EM);

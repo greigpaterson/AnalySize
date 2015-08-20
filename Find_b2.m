@@ -37,8 +37,8 @@ iter = 2; % Current iteration count
 b2 = 0.4; % New b2 value - relatively large in the hope to ge C > -6 and establish a bound
 
 while iter < MaxIter
-    
-    [tmp_EMs, tmp_Abunds, Xprime] = HALS_NMF(X, k, 5e3, 10, [5, 0, 0, b2], 0);
+
+    [tmp_EMs, tmp_Abunds, Xprime] = HALS_NMF(X, k, 5e3, 10, [5, b2], 0);
     Convexity = GetConvexityError(X, tmp_EMs);
     
     % Get the convexity change - use this check for
@@ -97,4 +97,3 @@ while iter < MaxIter
     C_old = Convexity;
     
 end % end of the while loop
-
