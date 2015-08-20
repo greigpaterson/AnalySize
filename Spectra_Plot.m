@@ -27,11 +27,11 @@ function varargout = Spectra_Plot(varargin)
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @Spectra_Plot_OpeningFcn, ...
-                   'gui_OutputFcn',  @Spectra_Plot_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+    'gui_Singleton',  gui_Singleton, ...
+    'gui_OpeningFcn', @Spectra_Plot_OpeningFcn, ...
+    'gui_OutputFcn',  @Spectra_Plot_OutputFcn, ...
+    'gui_LayoutFcn',  [] , ...
+    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -104,7 +104,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Spectra_Plot_OutputFcn(hObject, eventdata, handles) 
+function varargout = Spectra_Plot_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -166,10 +166,14 @@ axis(newAxes, 'square');
 set(newAxes, 'FontUnits', 'Points', 'FontSize', 9)
 set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
-% set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
+set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 
 NewPos = [1.5, 1.5, 4.5, 4.5];
-set(newAxes, 'Position', NewPos);
+set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1], 'Box', 'off', 'TickDir', 'Out');
+
+% Place a new set of axes on top to create the box
+h0 = axes('Units', 'Centimeters', 'Position', NewPos);
+set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
 
 print(tmpFig, '-depsc', strcat(path, file));
 close(tmpFig);
@@ -181,7 +185,7 @@ Plot_Type = get(handles.Plot_Type, 'Value');
 
 FUnits = 'Pixels';
 FontSize1 = 12;
-% FontSize2 = 14;
+FontSize2 = 14;
 
 
 switch Plot_Type
@@ -190,22 +194,22 @@ switch Plot_Type
         plot(handles.Plot_Axes, Xplot, 100.*handles.Current_Data, '-k');
         set(get(handles.Plot_Axes, 'XLabel'), 'String', 'Ln(grain size in \mu{m})', 'FontUnits', FUnits, 'FontSize', FontSize1);
         set(get(handles.Plot_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
-%         set(get(handles.Plot_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
-                
+        set(get(handles.Plot_Axes, 'Title'), 'String', 'Multiple GSDs', 'FontUnits', FUnits, 'FontSize', FontSize2);
+        
     case 2 % Log-Linear Scale
         Xplot=handles.GS;
         plot(handles.Plot_Axes, Xplot, 100.*handles.Current_Data, '-k');
         set(handles.Plot_Axes, 'XScale', 'Log');
         set(get(handles.Plot_Axes, 'XLabel'), 'String', 'Grain size [\mu{m}]', 'FontUnits', FUnits, 'FontSize', FontSize1)
         set(get(handles.Plot_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
-%         set(get(handles.Plot_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
+        set(get(handles.Plot_Axes, 'Title'), 'String', 'Multiple GSDs', 'FontUnits', FUnits, 'FontSize', FontSize2);
         
     case 3 % Phi scale
         Xplot=handles.Phi;
         plot(handles.Plot_Axes, Xplot, 100.*handles.Current_Data, '-k');
         set(get(handles.Plot_Axes, 'XLabel'), 'String', '\phi', 'FontUnits', FUnits, 'FontSize', FontSize1)
         set(get(handles.Plot_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
-%         set(get(handles.Plot_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
+        set(get(handles.Plot_Axes, 'Title'), 'String', 'Multiple GSDs', 'FontUnits', FUnits, 'FontSize', FontSize2);
 end
 
 % --- Executes when entered data in editable cell(s) in Spec_Table.
@@ -229,7 +233,7 @@ if New_Status == 1 % is true
 else
     Tdata{Inds, 1} = false(1); % swtich False to True
 end
-    
+
 
 set(hObject,'Data',Tdata); % now set the table's data to the updated data cell array
 

@@ -251,7 +251,11 @@ set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);% set(get(newAxes, 'Children'), 'MarkerSize', 6);
 
 NewPos = [1.5, 1.5, 4.5, 4.5];
-set(newAxes, 'Position', NewPos);
+set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1], 'Box', 'off', 'TickDir', 'Out');
+
+% Place a new set of axes on top to create the box
+h0 = axes('Units', 'Centimeters', 'Position', NewPos);
+set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
 
 print(tmpFig, '-depsc', strcat(path, file));
 close(tmpFig);

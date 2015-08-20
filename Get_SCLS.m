@@ -1,7 +1,7 @@
 function [Abunds, EM_Fit] = Get_SCLS(X, E)
 %
 % Function to get the least squares solution for A from AE = X under the
-% constraints that A >= 0 and sum(A) = 1
+% constraints that sum(A) = 1
 %
 % Based on the algorithm from [1].
 %
@@ -51,8 +51,6 @@ for ii = 1:nData
     
     % Get the least squares solution
     a_ls = M\r;
-    
-    %     keyboard
     
     s = (M'*M)\ones(size(M,2), 1);
     

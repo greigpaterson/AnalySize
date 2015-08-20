@@ -22,7 +22,7 @@ function varargout = AnalySize(varargin)
 
 % Edit the above text to modify the response to help AnalySize
 
-% Last Modified by Greig Paterson 28-Jun-2015
+% Last Modified by Greig Paterson 15-Aug-2015
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -329,7 +329,7 @@ if Plot_Fits==1
         case 3 % Phi scale
             set(get(handles.EM_Axes, 'XLabel'), 'String', '\phi', 'FontUnits', FUnits, 'FontSize', FontSize1)
     end
-        
+    
 else
     % Make sure the end member plot is clear
     cla(handles.EM_Axes, 'reset'); % Reset the axes
@@ -468,7 +468,7 @@ elseif size(file,2) ~=0 % load and process
         
     elseif strcmpi(file_ext, 'dat') || strcmpi(file_ext, '$ls') || strcmpi(file_ext, 'ls')...
             || strcmpi(file_ext, 'csv') || strcmpi(file_ext, 'mes')
-
+        
         Load_Options('Main_Window_Call', handles.AnalySize_MW);
         
         if ~isempty( getappdata(handles.AnalySize_MW, 'Abort_Cancel') )
@@ -507,7 +507,7 @@ elseif size(file,2) ~=0 % load and process
     file_data=[{handles.File_Type_Flag}, {nFiles}];
     
     [Sample_Names, Grain_Size, Data]=Read_Data_Files(path, file, file_data, type_data);
-
+    
     % Check that all the grain size bins are consistent
     Err_Flag = 0;
     unique_lengths = length(unique(cellfun(@length, Grain_Size)));
@@ -575,13 +575,13 @@ function Load_Test_Data_Callback(hObject, eventdata, handles)
 % choice = menu('Select Test Data', 'Synthetic 1 (50x80, 3 EMs)', 'Real 1 (188x100)', 'Real 2 (1138x100)',...
 %     'Real 3 (157x116)', 'Real 4 (151x56)', 'Toy 1 (49x80, 2 EMs)', 'Toy 2 (99x80, 2 EMs)', ...
 %     'Weltje I (200x45)', 'Weltje II (200x45)', 'Weltje III (200x45)');
-% 
-% 
+%
+%
 % S = mfilename('fullpath');
 % name_len = length(mfilename());
 % MyPath = S(1:end-name_len);
-% 
-% 
+%
+%
 % switch choice
 %     case 1
 %         load(strcat(MyPath, 'Test_Data/Synth_Data.mat'));
@@ -603,40 +603,40 @@ function Load_Test_Data_Callback(hObject, eventdata, handles)
 %         load(strcat(MyPath, 'Test_Data/Weltje_II.mat'));
 %     case 10
 %         load(strcat(MyPath, 'Test_Data/Weltje_III.mat'));
-%         
+%
 %     otherwise
 %         % Do nothing
 %         return
 % end
-% 
+%
 % % Normalize the data
 % Data=bsxfun(@rdivide, Data,sum(Data, 2));
-% 
+%
 % handles.spec_ind=1; % Set the specimen index to 1
 % handles.Nspec=size(Data, 1); % Get the number of specimens
 % handles.nVar=size(Data, 2); % Get the number of variables
-% 
+%
 % % Reset the fits and tables
 % func_handles = SetDefaultHandles(handles, 'All');
 % handles = func_handles;
-% 
+%
 % handles.Data_Loaded = 1;
-% 
+%
 % handles.All_Names = cellstr(strcat('Spec', num2str((1:handles.Nspec)')));
 % handles.All_Data = num2cell(Data,2);
 % handles.All_GS = num2cell(repmat(GS, 1, handles.Nspec), 1);
 % handles.All_LGS = num2cell(repmat(log(GS), 1, handles.Nspec), 1);
 % handles.All_Phi = cellfun(@(x) -log2(x./1e3), handles.All_GS, 'Uniformoutput', 0);
-% 
+%
 % set(handles.Spec_Num, 'String', handles.All_Names{handles.spec_ind}); % set the index
-% 
+%
 % % Set the data table info
 % set(handles.Data_Table, 'Data', handles.All_Names, 'ColumnName', handles.Table_Cols);
-% 
+%
 % % Set and plot the current data
 % func_handles=Set_Current_Data(handles);
 % handles=func_handles;
-% 
+%
 % % save the updated handles
 guidata(hObject, handles);
 
@@ -745,7 +745,7 @@ if Fit_Opt_Return.FitStatus == 1
     % Set the handle fit status
     handles.FitStatus = Fit_Opt_Return.FitStatus;
     handles.Plot_Fits_Flag = 1; % Set the plot fit flag
-        
+    
     % Process the fit data
     handles.All_Fit_EMs = [handles.All_Fit_EMs, {Fit_Opt_Return.EndMembers}];
     handles.All_Fit_Abunds = [handles.All_Fit_Abunds, {Fit_Opt_Return.Abundances}];
@@ -821,7 +821,7 @@ if Fit_Opt_Return.FitStatus == 1
     % Set the current fit data
     func_handles = Set_Current_Fit(handles);
     handles = func_handles;
-
+    
     % Get the 95th percentiles for R^2 and theta
     nData = handles.Nspec;
     R2_95 = GetPercentile([0,diff(0:nData-1)], sort(handles.Specimen_QFit(:,1), 'descend')', 95);
@@ -877,6 +877,8 @@ set(newAxes, 'FontUnits', 'Points', 'FontSize', 9)
 set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
+set(get(newAxes, 'Title'), 'String', handles.All_Names{handles.spec_ind});
+
 
 % set(get(newAxes, 'Title'), 'Units', 'Centimeters');
 % TOP = get(get(newAxes, 'Title'), 'Position'); % Title Old Position
@@ -901,10 +903,10 @@ if handles.FitStatus == 1
 end
 
 % Do a MATLAB version check
-if handles.Version < 8.4    
+if handles.Version < 8.4
     % Set the legend and adjust it's properties
     hleg = legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'off', 'FontUnits', 'Points', 'FontSize', 8);
-    set(hleg, 'Box', 'off')
+    legend(hleg, 'boxon', 'XColor', 'white', 'YColor', 'white', 'color', 'white');
     
     LegLines = findobj(hleg, 'type','line');
     XD = get(LegLines(2),'XData');
@@ -931,12 +933,18 @@ if handles.Version < 8.4
     
 else
     % Set the legend and adjust it's properties
-    legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'off', 'FontUnits', 'Points', 'FontSize', 8);
+    legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'off', 'FontUnits', 'Points', 'FontSize', 8,...
+        'XColor', 'white', 'YColor', 'white', 'color', 'white');
 end
 
 % Reset to the desired size
 NewPos = [1.5, 1.5, 4.5, 4.5];
-set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1]);
+set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1], 'Box', 'off', 'TickDir', 'Out');
+
+% Place a new set of axes on top to create the box
+h0 = axes('Units', 'Centimeters', 'Position', NewPos);
+set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
+
 
 print(tmpFig, '-depsc', strcat(path, file));
 close(tmpFig);
@@ -953,7 +961,7 @@ if handles.FitStatus == 0
     return;
 else
     
-    [file,path] = uiputfile(strcat('End_Member_Fits.eps'),'Save the end member plot...');
+    [file,path] = uiputfile(strcat('End_Members.eps'),'Save the end member plot...');
     
     if ~ischar(file) && file==0
         % User has cancelled
@@ -995,7 +1003,7 @@ else
     if handles.Version < 8.4
         % Set the legend and adjust it's properties
         hleg = legend(Legend_String, 'Location', 'NorthEastOutside', 'FontUnits', 'Points', 'FontSize', 8);
-        legend(hleg, 'boxoff');
+        legend(hleg, 'boxon', 'XColor', 'white', 'YColor', 'white', 'color', 'white');
         
         LegLines = findobj(hleg, 'type','line');
         XD = get(LegLines(2),'XData');
@@ -1016,17 +1024,22 @@ else
         end
         
     else
-        legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'off', 'FontUnits', 'Points', 'FontSize', 8);
+        legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'on', 'FontUnits', 'Points', 'FontSize', 8,...
+            'XColor', 'white', 'YColor', 'white', 'color', 'white');
     end
     
     
     % Reset to the desired size
     NewPos = [1.5, 1.5, 4.5, 4.5];
-    set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1]);
+    set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1], 'Box', 'off', 'TickDir', 'Out');
+    
+    % Place a new set of axes on top to create the box
+    h0 = axes('Units', 'Centimeters', 'Position', NewPos);
+    set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
     
     print(tmpFig, '-depsc', strcat(path, file));
     close(tmpFig);
-
+    
 end
 
 

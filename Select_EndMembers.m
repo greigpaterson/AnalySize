@@ -332,7 +332,12 @@ set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 % Adjust size
 NewPos = [1.5, 1.5, PlotSize, PlotSize];
-set(newAxes, 'Position', NewPos);
+set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1], 'Box', 'off', 'TickDir', 'Out');
+
+% Place a new set of axes on top to create the box
+h0 = axes('Units', 'Centimeters', 'Position', NewPos);
+set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
+
 A1P1 = NewPos(1);
 
 % Reset the line widths
@@ -343,26 +348,30 @@ end
 
 % Do legend
 hleg1 = legend(newAxes, 'Data set', 'EM correlation', 'Specimen median', 'Specimen box & whisker', 'Location', 'SouthEast');
-set(hleg1, 'FontUnits', 'Points', 'FontSize', 7, 'Box', 'off',...
-    'Units', 'Centimeters', 'Position', [12.5, 4, 4, 2]);
+set(hleg1, 'FontUnits', 'Points', 'FontSize', 7, 'Box', 'on', 'XColor', 'white', 'YColor', 'white', 'color', 'white',...
+    'Units', 'Centimeters', 'Position', [12.5, 4, 4, 1.5]);
 
-% LegLines = findobj(hleg1, 'type','line');
-% XD = get(LegLines(2),'XData');
-% LineLen = (2/3) * (XD(2) - XD(1));
-% MidPoint = (1/2) * (XD(2) - XD(1));
-% 
-% set(LegLines(2:2:end),'XData', [XD(1), XD(1) + LineLen]);
-% set(LegLines,'MarkerSize', 5);
-% set(LegLines(1:2:end),'XData', MidPoint);
-% 
-% LegText = findobj(hleg1, 'type','text');
-% PosData = cell2mat(get(LegText, 'Position'));
-% Short = (XD(2) - XD(1)) - LineLen;
-% for ii = 1:size(PosData,1)
-%     PD = PosData(ii,:);
-%     PD(1) = PD(1) - Short;
-%     set(LegText(ii), 'Position', PD);
-% end
+% Do a MATLAB version check
+if handles.Version < 8.4
+    
+    LegLines = findobj(hleg1, 'type','line');
+    XD = get(LegLines(2),'XData');
+    LineLen = (2/3) * (XD(2) - XD(1));
+    MidPoint = (1/2) * (XD(2) - XD(1));
+    
+    set(LegLines(2:2:end),'XData', [XD(1), XD(1) + LineLen]);
+    set(LegLines,'MarkerSize', 5);
+    set(LegLines(1:2:end),'XData', MidPoint);
+    
+    LegText = findobj(hleg1, 'type','text');
+    PosData = cell2mat(get(LegText, 'Position'));
+    Short = (XD(2) - XD(1)) - LineLen;
+    for ii = 1:size(PosData,1)
+        PD = PosData(ii,:);
+        PD(1) = PD(1) - Short;
+        set(LegText(ii), 'Position', PD);
+    end
+end
 
 
 %% Do the second axes
@@ -376,7 +385,11 @@ set(get(newAxes2, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes2, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 
 NewPos = [A1P1 + PlotSize+1.5, 1.5, PlotSize, PlotSize];
-set(newAxes2, 'Position', NewPos);
+set(newAxes2, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1], 'Box', 'off', 'TickDir', 'Out');
+
+% Place a new set of axes on top to create the box
+h0 = axes('Units', 'Centimeters', 'Position', NewPos);
+set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
 
 
 % Reset the line widths
