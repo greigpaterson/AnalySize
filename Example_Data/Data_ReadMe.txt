@@ -13,6 +13,6 @@ Sheet "k=2" is the 2 end member case, sheet "k=3" is the 3 end member case, and 
 
 3) Example_Data_2.xlsx
 A set of synthetic data consisting of 100 specimens "measured" with 100 grain size bins.
-These data were used to construct Figure 2 in Paterson & Heslop (2015)..
+These data were used to construct Figure 2 in Paterson & Heslop (2015).
 Data are in Excel Format 1, where rows are specimens and columns are grain size bins.
 Sheet "Data" contains the AnalySize readable data, sheet "True_Data" contains the true end members and abundances.
