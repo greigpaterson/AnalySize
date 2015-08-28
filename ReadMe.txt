@@ -4,6 +4,8 @@ If users encounter bugs or problems using AnalySize, or have any suggestions for
 
 More information on the unmixing algorithms used in AnalySize can be found in Paterson & Heslop (2015). Details on how to use AnalySize are provided in the instruction manual packaged with AnalySize.
 
+The latest version of the software the GitHub front page (https://github.com/greigpaterson/AnalySize). Different versions can be gotten from the "releases" tab (https://github.com/greigpaterson/AnalySize/releases).
+
 
 Greig A. Paterson (greig.paterson "at" mail.iggcas.ac.cn)
 Institute of Geology & Geophysics, Chinese Academy of Science, Beijing, China.
@@ -16,4 +18,4 @@ Australian National University, Canberra, Australia.
 Brief Version History:
 (See the instruction manual for full details)
 
-v0.9 - Initial version submitted during publication review.
+v0.9.0-r - Initial version submitted during publication review.
