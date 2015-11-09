@@ -57,9 +57,9 @@ switch Fit_Type
         
     case 'SGG'
         
-        % q has lower bound of 1e-4 (approx. zero) to kept realistc values
-        % of p after the maximum entropy transformation
-        Lower = repmat([min(LGS(NZi)), min(abs(diff(LGS(NZi)))), 1e-4], kmax,1);
+        % A lower bound on |q| is imposed in Unmix_Para_EMs.m to kept 
+        % realistc values of p after the maximum entropy transformation
+        Lower = repmat([min(LGS(NZi)), min(abs(diff(LGS(NZi)))), -1], kmax,1);
         Upper = repmat([max(LGS(NZi)), max(LGS(NZi)) - min(LGS(NZi)), 1], kmax,1);
         
         % reduce the scale parameter by 2*k
@@ -204,7 +204,7 @@ for ii = kmin:kmax
             % the upper boundary
             
             if n < ii
-                Init(n+1:ii,:) = repmat( [mean(tmp_sorted(:,2)), mean(tmp_sorted(:,3)), 0.99 ], ii-n, 1);
+                Init(n+1:ii,:) = repmat( [mean(tmp_sorted(:,2)), mean(tmp_sorted(:,3)), 0.99], ii-n, 1);
             end
             
         case 'GEV'

@@ -1,4 +1,4 @@
-function [EMs, Sinds] = sortEMs(EMs, GS, Type)
+function [EMs, Sinds, Vals] = sortEMs(EMs, GS, Type)
 %
 % Function to sort returned end members by their median or modal grain size
 %

@@ -219,7 +219,7 @@ end
 
 set(get(handles.CM_Axes, 'XLabel'), 'String', 'M (\mu{m})', 'FontUnits', FUnits, 'FontSize', FontSize1)
 set(get(handles.CM_Axes, 'YLabel'), 'String', 'C (\mu{m})', 'FontUnits', FUnits, 'FontSize', FontSize1);
-set(get(handles.CM_Axes, 'Title'), 'String', 'C-M Plot', 'FontUnits', FUnits, 'FontSize', FontSize2);
+set(get(handles.CM_Axes, 'Title'), 'String', 'Passega''s CM Plot', 'FontUnits', FUnits, 'FontSize', FontSize2);
 
 
 % --- Executes on button press in Save_Plot.

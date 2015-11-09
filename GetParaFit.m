@@ -69,6 +69,7 @@ if isstruct(Transfer)
     end
 end
 
+%% Check for previous fit flag and main loop
 if Flag == 0
     
     %% Pre-allocate stuff

@@ -54,10 +54,15 @@ switch Fit_Type
         end
         
     case 'SGG'
+        % Impose a limit for the absoulte value of q - this limits the search space to realistic values
+        qlim = 0.25;
+        
+        Params(abs(Params(:,3)) < qlim, 3) = sign(Params(abs(Params(:,3)) < qlim, 3)) .* Params(abs(Params(:,3)) < qlim, 3);
         tmp_p =  2 + 6.*(1-Params(:,3)).^5;
-        for ii=1:k
-            EM(:,ii) = sggpdf(log(GS), Params(ii,1), Params(ii,2), Params(ii,3), tmp_p(ii));
-        end
+
+     for ii=1:k
+         EM(:,ii) = sggpdf(log(GS), Params(ii,1), Params(ii,2), Params(ii,3), tmp_p(ii));
+     end
         
     case 'GEV'
         for ii=1:k

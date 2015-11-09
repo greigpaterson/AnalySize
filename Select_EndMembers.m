@@ -65,11 +65,30 @@ else
 end
 
 % Get the main window
-try
-    MainWindow = findall(0,'type','figure', 'name', 'AnalySize');
+MainWindow = findall(0,'type','figure', 'name', 'AnalySize');
+if isempty(MainWindow)
+    % Can't find the main window
+    
+    % Get the version
+    Ver = ver('MATLAB');
+    handles.Version = str2double(Ver.Version);
+    
+    % Set the screen DPI
+    set(0, 'Units', 'Inches');
+    Si = get(0, 'ScreenSize');
+    set(0, 'Units', 'Pixels');
+    Sp = get(0, 'ScreenSize');
+    
+    tmp_dpi = Sp./Si;
+    DPI = mean(tmp_dpi(3:4));
+    
+    % Set the postion
+    parentPosition = Sp;
+    
+else
     parentPosition = get(MainWindow, 'Position');
-catch
-    error('Select_EndMember:MainWind', 'The Analysize main window cannot be found');
+    handles.Version = getappdata(MainWindow, 'Version');
+    DPI = getappdata(MainWindow, 'DPI');   
 end
 
 % Position to be relative to parent:
@@ -89,7 +108,6 @@ handles.EM_Max = DataTransfer.EM_Max;
 handles.EM_Min = DataTransfer.EM_Min;
 handles.EM_R2 = DataTransfer.EM_R2;
 
-handles.Version = getappdata(MainWindow, 'Version');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -101,7 +119,6 @@ FontSize2 = 14;
 FontSize3 = 12;
 
 % Scale the legend font size for different systems
-DPI = getappdata(MainWindow, 'DPI');
 if DPI > 72
     FontSize3 = FontSize3 * 72 / DPI;
 end
