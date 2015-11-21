@@ -1,4 +1,4 @@
-Included in this release of AnalySize and a number of synthetic example data sets.
+Included in this release of AnalySize are a number of synthetic example data sets.
 
 1) Test_Data.dat and Test_Data.xlsx
 A set of synthetic data consisting of 50 specimens "measured" with 100 grain size bins.
@@ -7,12 +7,18 @@ Test_Data.xlxs includes the data in an Excel spreadsheet. The "Format1" sheet pr
 
 2) Example_Data_1.xlsx
 Three sets of synthetic data consisting of 200 specimens "measured" with 100 grain size bins.
-These data were used to construct Figure 1 in Paterson & Heslop (2015)..
+These data were used to construct Figures 1 and 2 in Paterson & Heslop (2016).
 Data are in Excel Format 1, where rows are specimens and columns are grain size bins.
 Sheet "k=2" is the 2 end member case, sheet "k=3" is the 3 end member case, and sheet "k=4" is the 4 end member case.
 
 3) Example_Data_2.xlsx
 A set of synthetic data consisting of 100 specimens "measured" with 100 grain size bins.
-These data were used to construct Figure 2 in Paterson & Heslop (2015).
+These data were used to construct Figure 3 in Paterson & Heslop (2016).
 Data are in Excel Format 1, where rows are specimens and columns are grain size bins.
 Sheet "Data" contains the AnalySize readable data, sheet "True_Data" contains the true end members and abundances.
+
+4) Example_Data_3.xlsx
+Seven sets of synthetic data consisting of 200 specimens "measured" with 100 grain size bins.
+These data were used to construct Figures 5 and 6 in Paterson & Heslop (2016).
+Data are in Excel Format 1, where rows are specimens and columns are grain size bins.
+Each sheet is named "Min_Abund_XX", where "XX" denotes the minimum abundance of each end member.
