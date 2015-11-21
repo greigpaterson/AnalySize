@@ -135,7 +135,7 @@ plot(handles.Var_Axes, 0, 0, '-xb', 'MarkerEdgeColor', [1,0,0])
 hold(handles.Var_Axes, 'off')
 Plot_BoxWhisker(handles.Var_Axes, handles.Spec_R2, 'L')
 
-set(handles.Var_Axes, 'Xlim', [0, handles.EM_Max+1], 'YLim', [0.3, 1.01]);
+set(handles.Var_Axes, 'Xlim', [0, handles.EM_Max+1], 'YLim', [0.3, 1.01], 'XTick', 1:1:handles.EM_Max, 'XTickLabel', 1:1:handles.EM_Max);
 if ~isempty(handles.EM_R2)
     hleg = legend(handles.Var_Axes, 'Data set', 'EM correlation', 'Specimen median', 'Specimen box & whisker', 'Location', 'SouthEast');
 else
@@ -156,7 +156,7 @@ plot(handles.Angle_Axes, -1, 0, '-xb', 'MarkerEdgeColor', [1,0,0])
 hold(handles.Angle_Axes, 'off')
 Plot_BoxWhisker(handles.Angle_Axes, handles.Spec_Angle, 'U')
 
-set(handles.Angle_Axes, 'Xlim', [0, handles.EM_Max+1], 'YLim', [0, 15]);
+set(handles.Angle_Axes, 'Xlim', [0, handles.EM_Max+1], 'YLim', [0, 15], 'XTick', 1:1:handles.EM_Max, 'XTickLabel', 1:1:handles.EM_Max);
 hleg = legend(handles.Angle_Axes, 'Mean Angle', 'Specimen median', 'Specimen box & whisker', 'Location', 'NorthEast');
 set(hleg, 'FontUnits', FUnits, 'FontSize', FontSize3);
 
@@ -347,6 +347,12 @@ set(newAxes, 'FontUnits', 'Points', 'FontSize', 9, 'Units', 'Centimeters')
 set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
+
+% Readjust the x-axis scale and tickmarks
+set(newAxes, 'Xlim', get(handles.Var_Axes, 'Xlim'))
+set(newAxes, 'XTick', get(handles.Var_Axes, 'XTick'))
+set(newAxes, 'XTickLabel', get(handles.Var_Axes, 'XTickLabel'))
+
 % Adjust size
 NewPos = [1.5, 1.5, PlotSize, PlotSize];
 set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1], 'Box', 'off', 'TickDir', 'Out');
@@ -363,13 +369,22 @@ for ii = 1: length(C);
     set(C(ii),'LineWidth',1);
 end
 
+if handles.Version >= 8.4 % change symbol for buggy version (2014b and later)
+    Mk = get(newAxes.Children, 'Marker');
+    set(newAxes.Children(strcmpi(Mk, 'o')==1), 'Marker', 's');
+end
+
 % Do legend
 hleg1 = legend(newAxes, 'Data set', 'EM correlation', 'Specimen median', 'Specimen box & whisker', 'Location', 'SouthEast');
-set(hleg1, 'FontUnits', 'Points', 'FontSize', 7, 'Box', 'on', 'XColor', 'white', 'YColor', 'white', 'color', 'white',...
+set(hleg1, 'FontUnits', 'Points', 'FontSize', 7, 'Box', 'on', 'color', 'white',...
     'Units', 'Centimeters', 'Position', [12.5, 4, 4, 1.5]);
 
+
 % Do a MATLAB version check
-if handles.Version < 8.4
+if handles.Version <= 8.3 % 2014a and before
+    % Set the legend and adjust it's properties
+    
+    set(hleg1, 'XColor', 'white', 'YColor', 'white');
     
     LegLines = findobj(hleg1, 'type','line');
     XD = get(LegLines(2),'XData');
@@ -388,6 +403,9 @@ if handles.Version < 8.4
         PD(1) = PD(1) - Short;
         set(LegText(ii), 'Position', PD);
     end
+    
+    
+
 end
 
 
@@ -401,6 +419,12 @@ set(get(newAxes2, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes2, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes2, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 
+% Readjust the x-axis scale and tickmarks
+set(newAxes2, 'Xlim', get(handles.Var_Axes, 'Xlim'))
+set(newAxes2, 'XTick', get(handles.Var_Axes, 'XTick'))
+set(newAxes2, 'XTickLabel', get(handles.Var_Axes, 'XTickLabel'))
+
+% Adjust size
 NewPos = [A1P1 + PlotSize+1.5, 1.5, PlotSize, PlotSize];
 set(newAxes2, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1], 'Box', 'off', 'TickDir', 'Out');
 
@@ -411,10 +435,14 @@ set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
 
 % Reset the line widths
 C = get(newAxes2, 'Children');
-for ii = 1: length(C);
+for ii = 1:length(C);
     set(C(ii),'LineWidth',1);
 end
 
+if handles.Version >= 8.4 % change symbol for buggy version (2014b and later)
+    Mk = get(newAxes2.Children, 'Marker');
+    set(newAxes2.Children(strcmpi(Mk, 'o')==1), 'Marker', 's');
+end
 
 print(tmpFig, '-depsc', strcat(path, file));
 close(tmpFig);

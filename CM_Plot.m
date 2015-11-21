@@ -27,11 +27,11 @@ function varargout = CM_Plot(varargin)
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @CM_Plot_OpeningFcn, ...
-                   'gui_OutputFcn',  @CM_Plot_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+    'gui_Singleton',  gui_Singleton, ...
+    'gui_OpeningFcn', @CM_Plot_OpeningFcn, ...
+    'gui_OutputFcn',  @CM_Plot_OutputFcn, ...
+    'gui_LayoutFcn',  [] , ...
+    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -67,7 +67,7 @@ if (isempty(DataTransfer)) ...
 else
     DataTransfer = varargin{DataTransfer+1};
     handles.MainWindow = varargin{3};
-        handles.Defaults = getappdata(varargin{3}, 'Defaults');
+    handles.Defaults = getappdata(varargin{3}, 'Defaults');
 end
 
 
@@ -81,6 +81,10 @@ newW = currentPosition(3);
 newH = currentPosition(4);
 set(hObject, 'Position', [newX, newY, newW, newH]);
 
+
+% Get the version
+Ver = ver('MATLAB');
+handles.Version = str2double(Ver.Version);
 
 % Get the data from previous window
 handles.Data = DataTransfer.Data;
@@ -113,7 +117,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = CM_Plot_OutputFcn(hObject, eventdata, handles) 
+function varargout = CM_Plot_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -178,7 +182,7 @@ if strcmpi(handles.Face_Color, 'none')
 else
     Defaults.CMFaceColor = 'filled';
 end
-    
+
 handles.Defaults = Defaults;
 
 setappdata(handles.MainWindow, 'Defaults', handles.Defaults);
@@ -250,12 +254,28 @@ set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);% set(get(newAxes, 'Children'), 'MarkerSize', 6);
 
+% Readjust the x-axis scale and tickmarks
+set(newAxes, 'Xlim', get(handles.CM_Axes, 'Xlim'))
+set(newAxes, 'XTick', get(handles.CM_Axes, 'XTick'))
+set(newAxes, 'XTickLabel', get(handles.CM_Axes, 'XTickLabel'))
+
+% Adjust size
 NewPos = [1.5, 1.5, 4.5, 4.5];
 set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1], 'Box', 'off', 'TickDir', 'Out');
 
+
 % Place a new set of axes on top to create the box
-h0 = axes('Units', 'Centimeters', 'Position', NewPos);
-set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
+if handles.Version <= 8.3 % 2014a and before
+    h0 = axes('Units', 'Centimeters', 'Position', NewPos);
+    set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
+else% 2014b and later
+    h0=copyobj(newAxes, tmpFig);
+    cla(h0);
+    set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
+    set(h0, 'Title', [], 'XLabel', [], 'YLabel', []);
+end
+
+% keyboard
 
 print(tmpFig, '-depsc', strcat(path, file));
 close(tmpFig);

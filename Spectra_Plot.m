@@ -80,6 +80,9 @@ newW = currentPosition(3);
 newH = currentPosition(4);
 set(hObject, 'Position', [newX, newY, newW, newH]);
 
+% Get the version
+Ver = ver('MATLAB');
+handles.Version = str2double(Ver.Version);
 
 % Get the data from previous window
 handles.Data = DataTransfer.Data;
@@ -168,12 +171,25 @@ set(get(newAxes, 'XLabel'), 'FontUnits', 'Points', 'FontSize', 10)
 set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 
+% Readjust the x-axis scale and tickmarks
+set(newAxes, 'Xlim', get(handles.Plot_Axes, 'Xlim'))
+set(newAxes, 'XTick', get(handles.Plot_Axes, 'XTick'))
+set(newAxes, 'XTickLabel', get(handles.Plot_Axes, 'XTickLabel'))
+
+
 NewPos = [1.5, 1.5, 4.5, 4.5];
 set(newAxes, 'Position', NewPos, 'XColor', [1,1,1], 'YColor', [1,1,1], 'Box', 'off', 'TickDir', 'Out');
 
 % Place a new set of axes on top to create the box
-h0 = axes('Units', 'Centimeters', 'Position', NewPos);
-set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
+if handles.Version <= 8.3 % 2014a and before
+    h0 = axes('Units', 'Centimeters', 'Position', NewPos);
+    set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
+else% 2014b and later
+    h0=copyobj(newAxes, tmpFig);
+    cla(h0);
+    set(h0, 'box', 'on', 'XTick', [], 'YTick', [], 'color', 'none');
+    set(h0, 'Title', [], 'XLabel', [], 'YLabel', []);
+end
 
 print(tmpFig, '-depsc', strcat(path, file));
 close(tmpFig);

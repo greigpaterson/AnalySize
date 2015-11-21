@@ -879,12 +879,11 @@ set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
 set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
 set(get(newAxes, 'Title'), 'String', handles.All_Names{handles.spec_ind});
 
+% Readjust the x-axis scale and tickmarks
+set(newAxes, 'Xlim', get(handles.PDF_Axes, 'Xlim'))
+set(newAxes, 'XTick', get(handles.PDF_Axes, 'XTick'))
+set(newAxes, 'XTickLabel', get(handles.PDF_Axes, 'XTickLabel'))
 
-% set(get(newAxes, 'Title'), 'Units', 'Centimeters');
-% TOP = get(get(newAxes, 'Title'), 'Position'); % Title Old Position
-
-
-% keyboard
 
 % Do the legend
 Legend_String = {'Data'};
@@ -903,7 +902,7 @@ if handles.FitStatus == 1
 end
 
 % Do a MATLAB version check
-if handles.Version < 8.4
+if handles.Version <= 8.3 % 2014a and before
     % Set the legend and adjust it's properties
     hleg = legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'off', 'FontUnits', 'Points', 'FontSize', 8);
     legend(hleg, 'boxon', 'XColor', 'white', 'YColor', 'white', 'color', 'white');
@@ -931,10 +930,17 @@ if handles.Version < 8.4
         set(LegText(ii), 'Position', PD);
     end
     
-else
+else % 2014b and later
+    
+    % Adjust the symbol for the plot - trys deals with the bug
+    Mk = get(newAxes.Children, 'Marker');
+%     set(newAxes.Children(strcmpi(Mk, 'o')==1), 'MarkerSize', 20);
+    set(newAxes.Children(strcmpi(Mk, 'o')==1), 'Marker', 's');
+
     % Set the legend and adjust it's properties
-    legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'off', 'FontUnits', 'Points', 'FontSize', 8,...
-        'XColor', 'white', 'YColor', 'white', 'color', 'white');
+    hleg1 = legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'on', 'FontUnits', 'Points', 'FontSize', 8);
+    set(hleg1, 'Color', 'white', 'EdgeColor', 'white');
+    
 end
 
 % Reset to the desired size
@@ -983,6 +989,12 @@ else
     set(get(newAxes, 'YLabel'), 'FontUnits', 'Points', 'FontSize', 10);
     set(get(newAxes, 'Title'), 'FontUnits', 'Points', 'FontSize', 11);
     
+    % Readjust the x-axis scale and tickmarks
+    set(newAxes, 'Xlim', get(handles.PDF_Axes, 'Xlim'))
+    set(newAxes, 'XTick', get(handles.PDF_Axes, 'XTick'))
+    set(newAxes, 'XTickLabel', get(handles.PDF_Axes, 'XTickLabel'))
+    
+    
     % Reset the line widths
     C = get(newAxes, 'Children');
     for ii = 1: length(C);
@@ -1000,7 +1012,7 @@ else
     end
     
     % Do a MATLAB version check
-    if handles.Version < 8.4
+    if handles.Version <= 8.3 % 2014a and before
         % Set the legend and adjust it's properties
         hleg = legend(Legend_String, 'Location', 'NorthEastOutside', 'FontUnits', 'Points', 'FontSize', 8);
         legend(hleg, 'boxon', 'XColor', 'white', 'YColor', 'white', 'color', 'white');
@@ -1023,11 +1035,11 @@ else
             set(LegText(ii), 'Position', PD);
         end
         
-    else
-        legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'on', 'FontUnits', 'Points', 'FontSize', 8,...
-            'XColor', 'white', 'YColor', 'white', 'color', 'white');
+    else % 2014b and later
+        % Set the legend and adjust it's properties
+        hleg1 = legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'on', 'FontUnits', 'Points', 'FontSize', 8);
+        set(hleg1, 'Color', 'white', 'EdgeColor', 'white');
     end
-    
     
     % Reset to the desired size
     NewPos = [1.5, 1.5, 4.5, 4.5];
