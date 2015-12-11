@@ -231,6 +231,8 @@ try
     
     msgbox(MSG, 'File loaded', 'modal')
     
+    guidata(hObject, handles);
+    
 catch
     warndlg('End member file could not be loaded.', 'File not loaded', 'modal')
     return

@@ -179,6 +179,8 @@ else
     
 end
 
+
+
 % --- Set the current data
 % set the data for the currently loaded sample
 function func_handles = Set_Current_Data(handles)
@@ -203,6 +205,7 @@ Update_Plots(handles)
 
 % Save the updated handles to the temporary variable func_handles
 func_handles=handles;
+
 
 % --- Set the currently selected fit
 % set the data for the currently selected fit
@@ -826,7 +829,6 @@ if Fit_Opt_Return.FitStatus == 1
     nData = handles.Nspec;
     R2_95 = GetPercentile([0,diff(0:nData-1)], sort(handles.Specimen_QFit(:,1), 'descend')', 95);
     Theta_95 = GetPercentile([0,diff(0:nData-1)], sort(handles.Specimen_QFit(:,2), 'descend')', 5);
-    
     
     % Set the table data
     handles.Fit_Table_Data = [handles.Fit_Table_Data;...

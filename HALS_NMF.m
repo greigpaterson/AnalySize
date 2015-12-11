@@ -86,7 +86,7 @@ for Rep_ind = 1:Reps
     
     % Initialize the matrices
     % X is the data (nData nVar)
-    % A is teh EM adundances (nData x nEnd)
+    % A is the EM adundances (nData x nEnd)
     % S is the endmembers (nEnd x nVar)
         
     % SISAL initialization

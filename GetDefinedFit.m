@@ -39,6 +39,7 @@ for ii = 1:k
     EMs(ii,:) = interp1(EM_GS, Input_EMs(ii,:), GS, 'linear', 0)';
 end
 
+EMs = EMs./repmat(sum(EMs,2), 1, size(EMs,2)); % sum-to-one
 
 %% Unmix and get the fit qualities
 
@@ -49,5 +50,9 @@ Spec_R2 = GetR2(X', Xprime')';
 DataSet_Angle = GetAngles(X(:), Xprime(:));
 Spec_Angle  = GetAngles(X, Xprime);
 
+r = GetR2(EMs');
+r = r - diag(diag(r));
+EM_R2 = max(max(r.^2));
 
-Fit_Quality = {[R2, DataSet_Angle], [Spec_R2, Spec_Angle]};
+
+Fit_Quality = {[R2, DataSet_Angle, EM_R2], [Spec_R2, Spec_Angle]};

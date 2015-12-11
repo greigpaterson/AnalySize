@@ -127,7 +127,12 @@ if Flag == 0
         
         [Params, fval(k), EF(k)] = fminsearchbnd(@(z) Unmix_Para_EMs(X, GS, k, Fit_Type, z, 'Projection'), Initial(1:k,:), Lower(1:k,:), Upper(1:k,:), options);
         
-        [~, Xprime, tmp_EM] = Unmix_Para_EMs(X, GS, k, Fit_Type, Params, 'Projection');
+        [~, Xprime, tmp_EM, ~, Validity] = Unmix_Para_EMs(X, GS, k, Fit_Type, Params, 'Projection');
+        
+        % Check the validity and if not do FCLS
+        if Validity ~=1
+            [~, Xprime, tmp_EM] = Unmix_Para_EMs(X, GS, k, Fit_Type, Params, 'FCLS');
+        end
         
         % Sort the EMs
         [tmp_EM, Sinds] = sortEMs(tmp_EM, GS, 'Median');
