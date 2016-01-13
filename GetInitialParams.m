@@ -19,7 +19,7 @@ function [Lower, Upper, Initial] = GetInitialParams(X, GS, kmin, kmax, Fit_Type)
 %% Get some basic stuff
 
 % Get dimensions
-[nData, ~] = size(X);
+[nData, nVar] = size(X);
 
 LGS = log(GS); % log grain size
 
@@ -91,7 +91,7 @@ for ii = kmin:kmax
     [tmp_EM, tmp_Abunds] = HALS_NMF(X, ii, 5e3, 10);
     
     % Sort the EMs by their mean abundances
-    [~, Sinds] = sortrows(mean(tmp_Abunds)', -1);
+    [sorted_abunds, Sinds] = sortrows(mean(tmp_Abunds)', -1);
     tmp_EM = tmp_EM(Sinds,:);
     
     % Get the EM gradients

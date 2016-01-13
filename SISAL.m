@@ -17,6 +17,7 @@ function [M] = SISAL(X, k)
 % Note:
 % The is a modification of the SISAL funtion written by Jos? Bioucas-Dias. 
 % The original code was downloaded from (http://www.lx.it.pt/~bioucas/code.htm).
+% This script has a separate licence agreement.
 % All modifications were made by Greig A. Paterson.
 %
 %
@@ -77,7 +78,7 @@ X = X - repmat(Xbar, 1, nData);
 Try = 0;
 while Try <= 1e2
     try
-        [Up, ~, ~] = svds(X*X'/nData, k-1);
+        [Up, S, V] = svds(X*X'/nData, k-1);
         break
     catch
         Try = Try + 1;

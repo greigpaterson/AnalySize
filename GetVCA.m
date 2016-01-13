@@ -46,7 +46,7 @@ Try = 0;
 while Try <= 1e2
     try
         % project using all k components and original data
-        [Ud, ~, ~] = svds(X*X'/nData, k);  % projection matrix ([1] algorithm line 4)
+        [Ud, S, V] = svds(X*X'/nData, k);  % projection matrix ([1] algorithm line 4)
         Xp =  Ud' * X;
         
         M = Ud * Xp; % The mixing matrix [nVar x nData]
@@ -81,7 +81,7 @@ for ii = 1:k
     v = f'*Y;
     
     % Find the index of the extreme value
-    [~, Inds(ii)] = max( abs(v) );
+    [MaxVal, Inds(ii)] = max( abs(v) );
     
     % Update the auxiliary matrix 
     Am(:,ii) = Y(:,Inds(ii));

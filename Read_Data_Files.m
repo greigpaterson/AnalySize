@@ -23,9 +23,17 @@ switch File_Type_Flag
         for ii=1:nfiles
             
             if nfiles > 1
-                [~, ~, all_data]=xlsread(strcat(path, files{1,ii}), SheetName, '', 'basic');
+                try
+                    [NUM, TXT, all_data]=xlsread(strcat(path, files{1,ii}), SheetName, '', 'basic');
+                catch
+                    [NUM, TXT, all_data]=xlsread(strcat(path, files{1,ii}), SheetName);
+                end
             else
-                [~, ~, all_data]=xlsread(strcat(path, files), SheetName, '', 'basic');
+                try
+                    [NUM, TXT, all_data]=xlsread(strcat(path, files), SheetName, '', 'basic');
+                catch
+                    [NUM, TXT, all_data]=xlsread(strcat(path, files), SheetName);
+                end
             end
             
             if XL_layout == 1
@@ -398,9 +406,9 @@ switch File_Type_Flag
             for ii=1:nfiles
                 
                 if nfiles > 1
-                    FID=fopen(strcat(path, files{1,ii}));
+                    FID=fopen(strcat(path, files{1,ii}), 'rt');
                 else
-                    FID=fopen(strcat(path, files));
+                    FID=fopen(strcat(path, files), 'rt');
                 end
                 
                 % Read the first line to get the header and number of lines
@@ -410,7 +418,7 @@ switch File_Type_Flag
                 
                 % Make the data format string
                 fmt = repmat(strcat('%f',delim), 1, N-1);
-                fmt = strcat(fmt, '%f\n');
+                fmt = strcat(fmt, '%f');
                 
                 input = textscan(FID, fmt);
                 fclose(FID);

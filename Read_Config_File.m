@@ -19,7 +19,6 @@ Setting_Types = [{'String'}, {'String'}, {'String'}, {'Number'},...
 
 nSettings = length(All_Settings);
 
-
 % Find the config file
 if exist(strcat(MyPath, 'UserDefaults.cfg'), 'file') == 2
     % The file exists so load user defaults
@@ -38,8 +37,17 @@ input=textscan(FID, '%s = %s\n');
 fclose(FID);
 nDefault = length(input{1});
 
+
 if nDefault ~= nSettings
-    % if the number of settings doesn't match try the default config file
+    % if the number of settings doesn't match try different line endings
+    FID=fopen(Config_File, 'r');
+    input=textscan(FID, '%s = %s\r\n');
+    fclose(FID);
+    nDefault = length(input{1});
+end
+
+if nDefault ~= nSettings
+    % if the number of settings still doesn't match try the default config file
     warning('AnalySize:ConfigFile', 'Configuration file inconsistent, attempting load default configuration file.')
     Config_File = strcat(MyPath, 'AnalySizeDefaults.cfg');
     FID=fopen(Config_File, 'r');
@@ -49,7 +57,7 @@ if nDefault ~= nSettings
 end
 
 if nDefault ~= nSettings
-    % if the number of settings still doesn't match - ERROR
+    % if the number of settings STILL doesn't match - ERROR
     error('AnalySize:ConfigFile', 'Default configuration file is corrupted or settings are missing.');
 end
 

@@ -67,8 +67,7 @@ switch Type_Flag
         Sigma = exp( (P84 - P16)./4 + (P95 - P05)./6.6 );
         Sk = (P16 + P84 - 2.*P50) ./ (2.*(P84 - P16)) + (P05 + P95 - 2.*P50) ./ (2.*(P95 - P05));
         Kurt = (P05 - P95) ./ (2.44.*(P25 - P75));
-        
-        
+               
     case 4 % Log graphic
         
         P = GetPercentile(X, Phi(1,:), pvals1);
@@ -89,7 +88,30 @@ switch Type_Flag
         
         P = GetPercentile(X, GS(1,:), pvals2);
         Stats = [P(:,1), P(:,2), P(:,3), P(:,4), P(:,5)];
-               
+        
+    case 6 % Size fractions
+
+        Phi = Phi(1,:); % Isolate a single vector
+        
+        % some machines do not measure upto -1 phi
+        sand_lim = -1;
+        if min(Phi) > -1
+            sand_lim = min(Phi);
+        end
+        
+        
+        % The data cumulative sum
+        CS = cumsum(X,2);
+        
+        % The precentages
+        clay_pct = interp1(Phi, CS', 8)';
+        silt_pct = interp1(Phi, CS', 4)' - clay_pct;
+        sand_pct = interp1(Phi, CS', sand_lim)' - interp1(Phi, CS', 4)';
+        gravel_pct = 1-interp1(Phi, CS', sand_lim)';
+        gravel_pct(gravel_pct<1e-6) = 0; % remove rounding errors
+        
+        Stats = [clay_pct, silt_pct, sand_pct, gravel_pct].*100;
+                       
     otherwise
         error('Get_Descriptive_Stats:Type_Flag', 'Unrecognized statistics flag requested.');
 end

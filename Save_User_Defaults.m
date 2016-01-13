@@ -3,6 +3,7 @@ function Save_User_Defaults(Defaults)
 % Saves user specified default paramters for AnalySize
 %
 
+
 % Get the main path
 S = mfilename('fullpath');
 name_len = length(mfilename());
@@ -10,12 +11,13 @@ MyPath = S(1:end-name_len);
 
 
 % Do the color defaults first
-EM_Plot = Defaults.EM_Plot_Color;
-Tern_Plot = Defaults.Tern_Plot_Color;
+EM_Plot = Defaults.EM_Plot_Color; %#ok<NASGU>
+Tern_Plot = Defaults.Tern_Plot_Color; %#ok<NASGU>
+CM_Plot = Defaults.CM_Plot_Color; %#ok<NASGU>
 
 % Save the color file and remove the fields from Defaults
-save(strcat(MyPath, 'UserColorDefaults.mat'), 'EM_Plot', 'Tern_Plot');
-Defaults = rmfield(Defaults, {'EM_Plot_Color', 'Tern_Plot_Color'});
+save(strcat(MyPath, 'UserColorDefaults.mat'), 'EM_Plot', 'Tern_Plot', 'CM_Plot');
+Defaults = rmfield(Defaults, {'EM_Plot_Color', 'Tern_Plot_Color', 'CM_Plot_Color'});
 
 % Get the text based settings
 FID = fopen( strcat(MyPath, 'UserDefaults.cfg'), 'wt');

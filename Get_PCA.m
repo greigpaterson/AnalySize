@@ -16,7 +16,7 @@ function [pc, score, latent] = Get_PCA(x)
 r = min(m-1,n);     % max possible rank of x
 
 
-[~,latent,pc] = svd(x./sqrt(m-1),0);
+[u,latent,pc] = svd(x./sqrt(m-1),0);
 score = x*pc;
 
 if nargout < 3

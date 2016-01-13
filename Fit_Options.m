@@ -202,7 +202,7 @@ try
     nCols = length(S);
     
     % Read the data
-    fmt = [repmat('%f\t', 1, nCols -1), '%f\n'];
+    fmt = [repmat('%f\t', 1, nCols -1), '%f'];
     input = textscan(FID, fmt, 'Delimiter', '\t');
     fclose(FID);
     

@@ -16,7 +16,7 @@ Yd=detrend(Y, 0); % (y-ybar)
 if corrXX ~= 1
     R2 = sum((Xd.*Yd)).^2 ./ ( sum(Xd.^2).*sum(Yd.^2) );    
 else
-    [~,n] = size(X);
+    [DummyVar,n] = size(X);
     
     R2 = NaN(n, n);
     

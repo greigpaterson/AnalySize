@@ -24,3 +24,4 @@ Australian National University, Canberra, Australia.
 | 0.9.0-r  | Initial version submitted during publication review |
 | 1.0.0   | The first official release coinciding with the G-Cubed publication |
 | 1.0.1   | Various minor bug fixes |
+| 1.0.2   | Improved backward compatibility with MATLAB plus bug fixes |

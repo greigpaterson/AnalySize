@@ -18,5 +18,6 @@ else
     Vals = GetPercentile(EMs, GS', 50);
 end
 
-[~, Sinds] = sort(Vals);
+[SortedVals, Sinds] = sort(Vals);
 EMs = EMs(Sinds,:);
+Vals = Vals(Sinds);

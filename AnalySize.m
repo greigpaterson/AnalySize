@@ -284,12 +284,12 @@ switch Plot_Type
         set(get(handles.PDF_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
         set(get(handles.PDF_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
         
-        %     case 4 % Linear scale - CUT
-        %         Xplot=handles.Current_GS;
-        %         plot(handles.PDF_Axes, Xplot, handles.Current_Data, 'ok');
-        %         set(get(handles.PDF_Axes, 'XLabel'), 'String', 'Grain size [\mu{m}]')
-        %         set(get(handles.PDF_Axes, 'YLabel'), 'String', 'Fractional abundance [%]');
-        %         set(get(handles.PDF_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind});
+    case 4 % Linear scale
+        Xplot=handles.Current_GS;
+        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'ok');
+        set(get(handles.PDF_Axes, 'XLabel'), 'String', 'Grain size [\mu{m}]')
+        set(get(handles.PDF_Axes, 'YLabel'), 'String', 'Fractional abundance [%]');
+        set(get(handles.PDF_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind});
 end
 
 set(handles.PDF_Axes, 'ColorOrder', handles.Default_Plot_Colors);
@@ -331,6 +331,8 @@ if Plot_Fits==1
             set(get(handles.EM_Axes, 'XLabel'), 'String', 'Grain size [\mu{m}]', 'FontUnits', FUnits, 'FontSize', FontSize1)
         case 3 % Phi scale
             set(get(handles.EM_Axes, 'XLabel'), 'String', '\phi', 'FontUnits', FUnits, 'FontSize', FontSize1)
+        case 4 % Linear scale
+            set(get(handles.EM_Axes, 'XLabel'), 'String', 'Grain size [\mu{m}]', 'FontUnits', FUnits, 'FontSize', FontSize1)
     end
     
 else
@@ -450,7 +452,13 @@ elseif size(file,2) ~=0 % load and process
         % Excel file
         handles.File_Type_Flag='Excel';
         
-        [~,sheets] = xlsfinfo(strcat(path, file));
+        [status,sheets] = xlsfinfo(strcat(path, file));
+        
+        if strcmpi(file_ext, 'xls') && strcmpi(handles.OS, 'Mac')           
+           warndlg({'Older xls files are not fully supported in OS X.';...
+               'Please save the file as xlsx or in text format'}, '*.xls not supported')
+           return
+        end
         
         Load_Options_XL('Main_Window_Call', handles.AnalySize_MW, sheets);
         

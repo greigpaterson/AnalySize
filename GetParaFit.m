@@ -127,11 +127,11 @@ if Flag == 0
         
         [Params, fval(k), EF(k)] = fminsearchbnd(@(z) Unmix_Para_EMs(X, GS, k, Fit_Type, z, 'Projection'), Initial(1:k,:), Lower(1:k,:), Upper(1:k,:), options);
         
-        [~, Xprime, tmp_EM, ~, Validity] = Unmix_Para_EMs(X, GS, k, Fit_Type, Params, 'Projection');
+        [MisFit, Xprime, tmp_EM, tmp_Abunds, Validity] = Unmix_Para_EMs(X, GS, k, Fit_Type, Params, 'Projection');
         
         % Check the validity and if not do FCLS
         if Validity ~=1
-            [~, Xprime, tmp_EM] = Unmix_Para_EMs(X, GS, k, Fit_Type, Params, 'FCLS');
+            [MisFit, Xprime, tmp_EM] = Unmix_Para_EMs(X, GS, k, Fit_Type, Params, 'FCLS');
         end
         
         % Sort the EMs
@@ -207,10 +207,10 @@ Selected_EM = Return.EM;
 
 % Check the validity of the simplex projection and run FCLS if needed
 Dist_Params = Stored_Params{Selected_EM};
-[~, ~, EMs, Abunds, Validity] = Unmix_Para_EMs(X, GS, Selected_EM, Fit_Type, Dist_Params, 'Projection');
+[MisFit, Xprime, EMs, Abunds, Validity] = Unmix_Para_EMs(X, GS, Selected_EM, Fit_Type, Dist_Params, 'Projection');
 
 if Validity ~=1
-    [~, ~, EMs, Abunds] = Unmix_Para_EMs(X, GS, Selected_EM, Fit_Type, Dist_Params, 'FCLS');
+    [MisFit, Xprime, EMs, Abunds] = Unmix_Para_EMs(X, GS, Selected_EM, Fit_Type, Dist_Params, 'FCLS');
 end
 
 % Get p for SGG fits

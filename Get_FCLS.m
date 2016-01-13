@@ -76,7 +76,7 @@ for ii = 1:nData
         a_fcls(inds) = a_fcls(inds)./s(inds);
         
         % Find the index of the maximum value
-        [~, MaxInd] = max(abs(a_fcls(inds)));
+        [MaxVal, MaxInd] = max(abs(a_fcls(inds)));
         
         % Remove MaxInd from the endmembers
         M(:, inds(MaxInd)) = [];

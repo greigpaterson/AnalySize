@@ -111,8 +111,7 @@ for Rep_ind = 1:Reps
             Sk = S(k_ind, :);
             Ak = A(:, k_ind);
             Xk = X - A*S + Ak*Sk;
-            
-                         
+                                     
            % Update Sk, the end members
             S_sum = sum(S,1) - Sk;
             
