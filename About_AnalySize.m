@@ -65,7 +65,7 @@ set(handles.txt_Title, 'string', 'AnalySize v1.0.2');
 set(handles.txt_Date, 'string', '13/01/2016');
 set(handles.txt_MSG, 'string',...
     'Thank you for using AnalySize. If you found it useful and you use it in your work,  we would be very grateful if you cited the following reference: ');
-set(handles.txt_Ref, 'string', 'Paterson, G. A., and D. Heslop, New methods for unmixing sediment grain size data (2016), Geochem. Geophys. Geosyst., doi: 10.1002/2015GC006070');
+set(handles.txt_Ref, 'string', 'Paterson, G. A., and D. Heslop, New methods for unmixing sediment grain size data (2015), Geochem. Geophys. Geosyst., 16, 4494-4506, doi: 10.1002/2015GC006070');
 set(handles.txt_URL, 'string', [{'The latest version of AnalySize is avaiable at:'}, {'https://github.com/greigpaterson/AnalySize'}]);
 
 
