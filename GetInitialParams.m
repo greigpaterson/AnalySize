@@ -141,13 +141,17 @@ for ii = kmin:kmax
     end
     
     n = size(tmp_sorted, 1);
+            
+    % Identify the first and last non-zero indices
+    NZi = NaN(ii,2);
+    for jj = 1:ii
+        NZi(jj,1) = find(tmp_EM(jj,:) > 0, 1, 'first');
+        NZi(jj,2) = find(tmp_EM(jj,:) > 0, 1, 'last');
+    end
     
-    
-    % Get the inital paramter guesses
-    %
-    % Find the grain size bins that are zero for all EMs
-    NZi = sum(tmp_EM==0)~=ii;
-    NZi_Lims = [find(LGS == min(LGS(NZi))), find(LGS == max(LGS(NZi)))]; % Grain size indices for start and end points
+    % define limits of the non-zero indices
+    % These are used for the Weibull fits
+    NZi_Lims =[min(NZi(:,1)), max(NZi(:,2))];   
     
     switch Fit_Type
         

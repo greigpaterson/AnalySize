@@ -22,7 +22,7 @@ function varargout = Spectra_Plot(varargin)
 
 % Edit the above text to modify the response to help Spectra_Plot
 
-% Last Modified by GUIDE v2.5 20-May-2015 15:00:12
+% Last Modified by GUIDE v2.5 08-Jun-2016 17:49:45
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -228,6 +228,10 @@ switch Plot_Type
         set(get(handles.Plot_Axes, 'Title'), 'String', 'Multiple GSDs', 'FontUnits', FUnits, 'FontSize', FontSize2);
 end
 
+% Reset the button down function
+set(handles.Plot_Axes, 'ButtonDownFcn', {@Plot_Axes_ButtonDownFcn, handles});
+
+
 % --- Executes when entered data in editable cell(s) in Spec_Table.
 function Spec_Table_CellEditCallback(hObject, eventdata, handles)
 % hObject    handle to Spec_Table (see GCBO)
@@ -312,3 +316,12 @@ function DB_ME_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 keyboard
+
+
+% --- Executes on mouse press over axes background.
+function Plot_Axes_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to Plot_Axes (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+PopOutFigure(handles.Plot_Axes, 'Multi-Specimen Plot')

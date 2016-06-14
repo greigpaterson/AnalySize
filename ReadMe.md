@@ -5,7 +5,13 @@ If users encounter bugs or problems using AnalySize, or have any suggestions for
 
 More information on the unmixing algorithms used in AnalySize can be found in Paterson & Heslop (2015). Details on how to use AnalySize are provided in the instruction manual packaged with AnalySize.
 
+## How to get it
 The latest version of the software the GitHub front page (https://github.com/greigpaterson/AnalySize). Different versions can be gotten from the "releases" tab (https://github.com/greigpaterson/AnalySize/releases).
+
+We recommend using GitHub Desktop (https://desktop.github.com/), which allows users to easily synchronize with the latest version of AnalySize.
+
+## Mailing list
+If users are interesting in receiving email updates about AnalySize, please send an email to let us know (address given below).
 
 ## Authors
 Greig A. Paterson (greig.paterson "at" mail.iggcas.ac.cn)
@@ -25,3 +31,4 @@ Australian National University, Canberra, Australia.
 | 1.0.0   | The first official release coinciding with the G-Cubed publication |
 | 1.0.1   | Various minor bug fixes |
 | 1.0.2   | Improved backward compatibility with MATLAB plus bug fixes |
+| 1.1.0   | Improved graphics customization options plus minor bug fixes |

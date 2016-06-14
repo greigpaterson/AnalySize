@@ -64,6 +64,9 @@ handles.output = hObject;
 Ver = ver('MATLAB');
 handles.Version = str2double(Ver.Version);
 
+handles.AnalySize_Version = '1.1.0';
+handles.AnalySize_Date = '14/06/2016';
+
 handles.Curent_Pos = get(handles.AnalySize_MW, 'Position');
 
 % Get the screen dpi
@@ -117,6 +120,17 @@ Defaults = Read_Config_File(MyPath);
 
 % Get the defaults needed for the main window
 handles.Default_Plot_Colors = Defaults.EM_Plot_Color;
+handles.Default_Data_Color = Defaults.Data_Plot_Color;
+handles.Default_Data_Symbol = Defaults.DataSymbol;
+handles.Default_Data_Symbol_Size = Defaults.DataSymbolSize;
+
+if strcmpi(Defaults.DataFaceColor, 'filled')
+    handles.Default_Data_Symbol_Fill = handles.Default_Data_Color;
+else
+    handles.Default_Data_Symbol_Fill = 'none';
+end
+
+
 % set(handles.PDF_Axes, 'ColorOrder', handles.Default_Plot_Colors);
 % set(handles.EM_Axes, 'ColorOrder', handles.Default_Plot_Colors);
 
@@ -256,6 +270,12 @@ function Update_Plots(handles)
 Plot_Type = get(handles.Plot_Type, 'Value');
 Plot_Fits = handles.Plot_Fits_Flag;
 
+% Get the plot symbols
+Msymbol = handles.Default_Data_Symbol;
+Msize = handles.Default_Data_Symbol_Size;
+Mcolor = handles.Default_Data_Color;
+Mfill = handles.Default_Data_Symbol_Fill;
+
 
 FUnits = 'Pixels';
 FontSize1 = 12; % 12pt font
@@ -264,32 +284,36 @@ FontSize2 = 14; % 14pt font
 switch Plot_Type
     case 1 % Log Scale
         Xplot=handles.Current_LGS;
-        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'ok', 'LineWidth', 1);
+        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'Marker', Msymbol, 'MarkerSize', Msize, 'MarkerFaceColor', Mfill, 'Color', Mcolor, 'LineStyle', 'none','LineWidth', 1);
         set(get(handles.PDF_Axes, 'XLabel'), 'String', 'Ln(grain size in \mu{m})', 'FontUnits', FUnits, 'FontSize', FontSize1);
         set(get(handles.PDF_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
+        set(get(handles.PDF_Axes, 'Title'), 'Interpreter', 'none');
         set(get(handles.PDF_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
         
     case 2 % Log-Linear Scale
         Xplot=handles.Current_GS;
-        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'ok', 'LineWidth', 1);
+        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data,  'Marker', Msymbol, 'MarkerSize', Msize, 'MarkerFaceColor', Mfill, 'Color', Mcolor, 'LineStyle', 'none', 'LineWidth', 1);
         set(handles.PDF_Axes, 'XScale', 'Log');
         set(get(handles.PDF_Axes, 'XLabel'), 'String', 'Grain size [\mu{m}]', 'FontUnits', FUnits, 'FontSize', FontSize1)
         set(get(handles.PDF_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
+        set(get(handles.PDF_Axes, 'Title'), 'Interpreter', 'none');
         set(get(handles.PDF_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
         
     case 3 % Phi scale
         Xplot=handles.Current_Phi;
-        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'ok', 'LineWidth', 1);
+        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data,  'Marker', Msymbol, 'MarkerSize', Msize, 'MarkerFaceColor', Mfill, 'Color', Mcolor, 'LineStyle', 'none', 'LineWidth', 1);
         set(get(handles.PDF_Axes, 'XLabel'), 'String', '\phi', 'FontUnits', FUnits, 'FontSize', FontSize1)
         set(get(handles.PDF_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
+        set(get(handles.PDF_Axes, 'Title'), 'Interpreter', 'none');
         set(get(handles.PDF_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
         
     case 4 % Linear scale
         Xplot=handles.Current_GS;
-        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data, 'ok');
-        set(get(handles.PDF_Axes, 'XLabel'), 'String', 'Grain size [\mu{m}]')
-        set(get(handles.PDF_Axes, 'YLabel'), 'String', 'Fractional abundance [%]');
-        set(get(handles.PDF_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind});
+        plot(handles.PDF_Axes, Xplot, 100.*handles.Current_Data,  'Marker', Msymbol, 'MarkerSize', Msize, 'MarkerFaceColor', Mfill, 'Color', Mcolor, 'LineStyle', 'none', 'LineWidth', 1);
+        set(get(handles.PDF_Axes, 'XLabel'), 'String', 'Grain size [\mu{m}]', 'FontUnits', FUnits, 'FontSize', FontSize1)
+        set(get(handles.PDF_Axes, 'YLabel'), 'String', 'Fractional abundance [%]', 'FontUnits', FUnits, 'FontSize', FontSize1);
+        set(get(handles.PDF_Axes, 'Title'), 'Interpreter', 'none');
+        set(get(handles.PDF_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
 end
 
 set(handles.PDF_Axes, 'ColorOrder', handles.Default_Plot_Colors);
@@ -310,6 +334,7 @@ if Plot_Fits==1
     tmp_theta = handles.Specimen_QFit(handles.spec_ind,2);
     
     MSG = [handles.All_Names{handles.spec_ind}, '; R^2 = ', sprintf('%2.3f', tmp_r2), ', Theta = ', sprintf('%2.3f', tmp_theta)];
+    set(get(handles.PDF_Axes, 'Title'), 'Interpreter', 'none');
     set(get(handles.PDF_Axes, 'Title'), 'String', MSG, 'FontUnits', FUnits, 'FontSize', FontSize2);
     
     % Plot the end members in their axes
@@ -357,6 +382,12 @@ else
     set(handles.EM_Axes, 'Box', 'on')
     
 end
+
+
+% Reset the button down functions
+set(handles.PDF_Axes, 'ButtonDownFcn', {@PDF_Axes_ButtonDownFcn, handles});
+set(handles.EM_Axes, 'ButtonDownFcn', {@EM_Axes_ButtonDownFcn, handles});
+
 
 
 % --- Executes when selected cell(s) is changed in Data_Table.
@@ -454,10 +485,10 @@ elseif size(file,2) ~=0 % load and process
         
         [status,sheets] = xlsfinfo(strcat(path, file));
         
-        if strcmpi(file_ext, 'xls') && strcmpi(handles.OS, 'Mac')           
-           warndlg({'Older xls files are not fully supported in OS X.';...
-               'Please save the file as xlsx or in text format'}, '*.xls not supported')
-           return
+        if strcmpi(file_ext, 'xls') && strcmpi(handles.OS, 'Mac')
+            warndlg({'Older xls files are not fully supported in OS X.';...
+                'Please save the file as xlsx or in text format'}, '*.xls not supported')
+            return
         end
         
         Load_Options_XL('Main_Window_Call', handles.AnalySize_MW, sheets);
@@ -520,28 +551,55 @@ elseif size(file,2) ~=0 % load and process
     [Sample_Names, Grain_Size, Data]=Read_Data_Files(path, file, file_data, type_data);
     
     % Check that all the grain size bins are consistent
-    Err_Flag = 0;
     unique_lengths = length(unique(cellfun(@length, Grain_Size)));
     
     if unique_lengths ~= 1
-        Err_Flag = 1;
-    end
-    
-    GS = cell2mat(Grain_Size);
-    if length(unique(GS)) ~= size(GS, 1)
-        Err_Flag = 1;
-    end
-    
-    if Err_Flag == 1
-        warndlg('Grain size bins are inconsistent. Please check the data.', 'Data Error!', 'modal');
+        warndlg('Number of grain size bins are inconsistent. Please check the data.', 'Data Error!', 'modal');
         return;
     end
     
+    GS = cell2mat(Grain_Size);
+    LGS = log(GS);
+    
+    % Check unique grain size bins and try rounding to obtain consistent bins
+    if length(unique(GS)) ~= size(GS, 1)
+        % The length is inconsistent
+        
+        % Try rounding
+        nGS = round(GS.*1e3)./1e3;
+        
+        
+        if length(unique(nGS)) == size(GS, 1)
+            % Sizes are now consistent, but tell the user
+            warndlg('Grain size bins have been rounded to 3 d.p. for consisitency.', 'Rounded Grain Sizes', 'modal');
+        else
+            % The length is still inconsistent
+            
+            % Try rounding in logspace
+            nGS = exp(round(LGS.*1e2)./1e2);
+            
+            if length(unique(nGS)) == size(GS, 1)
+                warndlg('Grain size bins have been rounded to 2 d.p. in log space for consisitency.', 'Rounded Grain Sizes', 'modal');
+            else
+                % Still inconsistent
+                % Throw a warning and do not open the data
+                warndlg('Grain size bins are inconsistent. Please check the data.', 'Data Error!', 'modal');
+                return;
+            end
+            
+        end
+        
+        % Assign the new GS to GS
+        GS = nGS;
+        Grain_Size = mat2cell(GS, size(GS,1), ones(1,nFiles)); % update the grain size cell
+
+    end
+    
     % Check and remove zeros from the grain sizes
-    inds = (GS(:,1)==0);
+    inds = (GS(:,1) == 0);
     Data = cellfun(@(x) x(~inds), Data, 'UniformOutput', 0);
     Grain_Size = cellfun(@(x) x(~inds), Grain_Size, 'UniformOutput', 0);
-    
+        
     % Set the data to the handles
     handles.All_Names=Sample_Names;
     handles.All_Data=Data;
@@ -748,6 +806,14 @@ catch
     return
 end
 
+% Check that a bare minimum of 10 data are loaded - this is a bare minimum!
+if handles.Nspec < 10
+    MSG = [{'Not enough data are currently loaded.'},...
+        {'At least 10 specimens are needed to try EMA, but 30 or more are recommended for robust results'}];
+    warndlg(MSG, 'Not Enough Data', 'modal')
+    return
+end
+
 % Load the fit options
 Fit_Opt_Return = Fit_Options('Main_Window_Call', handles.AnalySize_MW, handles.Sel_EM_Data);
 
@@ -943,10 +1009,10 @@ if handles.Version <= 8.3 % 2014a and before
 else % 2014b and later
     
     % Adjust the symbol for the plot - trys deals with the bug
-    Mk = get(newAxes.Children, 'Marker');
-%     set(newAxes.Children(strcmpi(Mk, 'o')==1), 'MarkerSize', 20);
-    set(newAxes.Children(strcmpi(Mk, 'o')==1), 'Marker', 's');
-
+%     Mk = get(newAxes.Children, 'Marker');
+%     %     set(newAxes.Children(strcmpi(Mk, 'o')==1), 'MarkerSize', 20);
+%     set(newAxes.Children(strcmpi(Mk, 'o')==1), 'Marker', 's');
+    
     % Set the legend and adjust it's properties
     hleg1 = legend(Legend_String, 'Location', 'NorthEastOutside', 'Box', 'on', 'FontUnits', 'Points', 'FontSize', 8);
     set(hleg1, 'Color', 'white', 'EdgeColor', 'white');
@@ -1442,9 +1508,11 @@ if ~ischar(file) && file==0
 end
 
 
-try
-    load(strcat(path, file), 'Session_handles');
-catch
+% try loading the file
+load(strcat(path, file), 'Session_handles');
+
+% Check to see if load threw any warning about missing variables
+if strcmpi(lastwarn, 'Variable ''Session_handles'' not found.')
     % Warn about invalid mat files and return
     warndlg('This is not a valid session file. Please try another.', 'Invalid files');
     return;
@@ -1720,7 +1788,7 @@ function MB_About_AnalySize_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-About_AnalySize();
+About_AnalySize('Version', handles.AnalySize_Version, 'Date', handles.AnalySize_Date);
 
 
 % --------------------------------------------------------------------
@@ -1792,3 +1860,93 @@ end
 setappdata(handles.AnalySize_MW, 'Defaults', Defaults);
 
 guidata(hObject, handles);
+
+
+% --------------------------------------------------------------------
+function MB_Set_Data_Symbols_Callback(hObject, eventdata, handles)
+% hObject    handle to MB_Set_Data_Symbols (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+Defaults = getappdata(handles.AnalySize_MW, 'Defaults');
+
+
+Transfer.Plot_Symbol = Defaults.DataSymbol;
+Transfer.Symbol_Size = Defaults.DataSymbolSize;
+Transfer.Symbol_Color = Defaults.Data_Plot_Color;
+Transfer.Face_Color = Defaults.DataFaceColor;
+
+Return_Data = Set_Data_Symbol('DataTransfer', Transfer, handles.AnalySize_MW, handles.AnalySize_MW);
+
+if Return_Data.CancelFlag == 1
+    return;
+end
+
+% Save the changes to session defaults
+
+Defaults.DataSymbol = Return_Data.Plot_Symbol;
+Defaults.DataSymbolSize = Return_Data.Symbol_Size;
+Defaults.Data_Plot_Color = Return_Data.Symbol_Color;
+
+if strcmpi(Return_Data.Face_Color, 'none')
+    Defaults.DataFaceColor = Return_Data.Face_Color;
+else
+    Defaults.DataFaceColor = 'filled';
+end
+
+setappdata(handles.AnalySize_MW, 'Defaults', Defaults);
+
+% Get the defaults needed for the main window
+handles.Default_Data_Color = Defaults.Data_Plot_Color;
+handles.Default_Data_Symbol = Defaults.DataSymbol;
+handles.Default_Data_Symbol_Size = Defaults.DataSymbolSize;
+
+if strcmpi(Defaults.DataFaceColor, 'filled')
+    handles.Default_Data_Symbol_Fill = handles.Default_Data_Color;
+else
+    handles.Default_Data_Symbol_Fill = 'none';
+end
+
+% Update the plots and save the handles
+Update_Plots(handles);
+guidata(hObject, handles);
+
+
+% --------------------------------------------------------------------
+function MB_Set_Select_EM_Plot_Callback(hObject, eventdata, handles)
+% hObject    handle to MB_Set_Select_EM_Plot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+Return_Data = SelectEM_Plot_Set_Symbols(handles.AnalySize_MW, handles.AnalySize_MW);
+
+if Return_Data.CancelFlag == 1
+    return;
+end
+
+% keyboard
+
+% Update the defaults
+handles.Defaults = Return_Data.Defaults;
+setappdata(handles.AnalySize_MW, 'Defaults', handles.Defaults);
+
+guidata(hObject,handles);
+
+
+
+% --- Executes on mouse press over axes background.
+function PDF_Axes_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to PDF_Axes (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+PopOutFigure(handles.PDF_Axes, 'Grain Size Data')
+
+
+% --- Executes on mouse press over axes background.
+function EM_Axes_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to EM_Axes (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+PopOutFigure(handles.EM_Axes, 'End Members')

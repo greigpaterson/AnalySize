@@ -22,7 +22,7 @@ function varargout = Select_EndMembers(varargin)
 
 % Edit the above text to modify the response to help Select_EndMembers
 
-% Last Modified by GUIDE v2.5 19-May-2015 14:19:42
+% Last Modified by GUIDE v2.5 13-Jun-2016 16:41:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -80,7 +80,7 @@ if isempty(MainWindow)
     Sp = get(0, 'ScreenSize');
     
     tmp_dpi = Sp./Si;
-    DPI = mean(tmp_dpi(3:4));
+    handles.DPI = mean(tmp_dpi(3:4));
     
     % Set the postion
     parentPosition = Sp;
@@ -88,7 +88,9 @@ if isempty(MainWindow)
 else
     parentPosition = get(MainWindow, 'Position');
     handles.Version = getappdata(MainWindow, 'Version');
-    DPI = getappdata(MainWindow, 'DPI');   
+    handles.DPI = getappdata(MainWindow, 'DPI');
+    handles.Defaults = getappdata(MainWindow, 'Defaults');
+    handles.MainWindow = MainWindow;
 end
 
 % Position to be relative to parent:
@@ -109,61 +111,7 @@ handles.EM_Min = DataTransfer.EM_Min;
 handles.EM_R2 = DataTransfer.EM_R2;
 
 
-% Update handles structure
-guidata(hObject, handles);
-
-% Update the plots
-FUnits = 'Pixels';
-FontSize1 = 12;
-FontSize2 = 14;
-FontSize3 = 12;
-
-% Scale the legend font size for different systems
-if DPI > 72
-    FontSize3 = FontSize3 * 72 / DPI;
-end
-
-plot(handles.Var_Axes, handles.DataSet_R2, '-ok', 'LineWidth', 2)
-hold(handles.Var_Axes, 'on')
-if ~isempty(handles.EM_R2)
-    plot(handles.Var_Axes, handles.EM_R2, '--^', 'LineWidth', 2, 'Color', [0.6, 0.6, 0.6])
-    set(handles.Label_EM_R2, 'Visible', 'on')
-    set(handles.Text_EM_R2, 'Visible', 'on')
-end
-plot(handles.Var_Axes, 0, 0, '-r')
-plot(handles.Var_Axes, 0, 0, '-xb', 'MarkerEdgeColor', [1,0,0])
-hold(handles.Var_Axes, 'off')
-Plot_BoxWhisker(handles.Var_Axes, handles.Spec_R2, 'L')
-
-set(handles.Var_Axes, 'Xlim', [0, handles.EM_Max+1], 'YLim', [0.3, 1.01], 'XTick', 1:1:handles.EM_Max, 'XTickLabel', 1:1:handles.EM_Max);
-if ~isempty(handles.EM_R2)
-    hleg = legend(handles.Var_Axes, 'Data set', 'EM correlation', 'Specimen median', 'Specimen box & whisker', 'Location', 'SouthEast');
-else
-    hleg = legend(handles.Var_Axes, 'Data set', 'Specimen median', 'Specimen box & whisker', 'Location', 'SouthEast');
-end
-set(hleg, 'FontUnits', FUnits, 'FontSize', FontSize3);
-
-set(get(handles.Var_Axes, 'XLabel'), 'String', 'Number of end members', 'FontUnits', FUnits, 'FontSize', FontSize1);
-set(get(handles.Var_Axes, 'YLabel'), 'String', 'R^2', 'FontUnits', FUnits, 'FontSize', FontSize1);
-set(get(handles.Var_Axes, 'Title'), 'String', 'Linear Correlations', 'FontUnits', FUnits, 'FontSize', FontSize2);
-
-
-% Update the angular dev plot
-plot(handles.Angle_Axes, handles.DataSet_Angle, '-ok', 'LineWidth', 2)
-hold(handles.Angle_Axes, 'on')
-plot(handles.Angle_Axes, -1, 0, '-r')
-plot(handles.Angle_Axes, -1, 0, '-xb', 'MarkerEdgeColor', [1,0,0])
-hold(handles.Angle_Axes, 'off')
-Plot_BoxWhisker(handles.Angle_Axes, handles.Spec_Angle, 'U')
-
-set(handles.Angle_Axes, 'Xlim', [0, handles.EM_Max+1], 'YLim', [0, 15], 'XTick', 1:1:handles.EM_Max, 'XTickLabel', 1:1:handles.EM_Max);
-hleg = legend(handles.Angle_Axes, 'Mean Angle', 'Specimen median', 'Specimen box & whisker', 'Location', 'NorthEast');
-set(hleg, 'FontUnits', FUnits, 'FontSize', FontSize3);
-
-set(get(handles.Angle_Axes, 'XLabel'), 'String', 'Number of end members', 'FontUnits', FUnits, 'FontSize', FontSize1);
-set(get(handles.Angle_Axes, 'YLabel'), 'String', 'Angle (degrees)', 'FontUnits', FUnits, 'FontSize', FontSize1);
-set(get(handles.Angle_Axes, 'Title'), 'String', 'Angular Deviation', 'FontUnits', FUnits, 'FontSize', FontSize2);
-
+Update_Plots(handles);
 
 % update the default selection and labels
 set(handles.Selected_EM, 'Value', handles.EM_Min, 'String', sprintf('%d', handles.EM_Min));
@@ -283,6 +231,107 @@ guidata(hObject,handles);
 Set_Var_Levels(handles);
 
 guidata(hObject,handles);
+
+
+% Update the plots
+function Update_Plots(handles)
+
+% Update the plots
+FUnits = 'Pixels';
+FontSize1 = 12;
+FontSize2 = 14;
+FontSize3 = 12;
+
+% Scale the legend font size for different systems
+if handles.DPI > 72
+    FontSize3 = FontSize3 * 72 / handles.DPI;
+end
+
+
+% Get the defaults for the plots
+Defaults = handles.Defaults;
+
+
+Data_Plot_Color = Defaults.SEM_Data_Plot_Color;
+DataSymbol = Defaults.SEM_DataSymbol;
+DataSymbolSize = Defaults.SEM_DataSymbolSize;
+
+if strcmpi(Defaults.SEM_DataFaceColor, 'filled')
+    Data_Symbol_Fill = Data_Plot_Color;
+else
+    Data_Symbol_Fill = 'none';
+end
+
+EM_Plot_Color = Defaults.SEM_EM_Plot_Color;
+EMSymbol = Defaults.SEM_EMSymbol;
+EMSymbolSize = Defaults.SEM_EMSymbolSize;
+
+if strcmpi(Defaults.SEM_EMFaceColor, 'filled')
+    EM_Symbol_Fill = EM_Plot_Color;
+else
+    EM_Symbol_Fill = 'none';
+end
+
+
+Box_Plot_Color = Defaults.SEM_Box_Plot_Color;
+Median_Plot_Color = Defaults.SEM_Median_Plot_Color;
+
+OL_Plot_Color = Defaults.SEM_Outlier_Plot_Color;
+OLSymbol = Defaults.SEM_OLSymbol;
+OLSymbolSize = Defaults.SEM_OLSymbolSize;
+
+if strcmpi(Defaults.SEM_OLFaceColor, 'filled')
+    OL_Symbol_Fill = OL_Plot_Color;
+else
+    OL_Symbol_Fill = 'none';
+end
+
+
+plot(handles.Var_Axes, handles.DataSet_R2, 'Color', Data_Plot_Color', 'Marker', DataSymbol, 'MarkerSize', DataSymbolSize, 'MarkerFaceColor', Data_Symbol_Fill, 'LineStyle', '-', 'LineWidth', 2)
+hold(handles.Var_Axes, 'on')
+if ~isempty(handles.EM_R2)
+    plot(handles.Var_Axes, handles.EM_R2, 'Color', EM_Plot_Color', 'Marker', EMSymbol, 'MarkerSize', EMSymbolSize, 'MarkerFaceColor', EM_Symbol_Fill, 'LineStyle', '--', 'LineWidth', 2)
+    set(handles.Label_EM_R2, 'Visible', 'on')
+    set(handles.Text_EM_R2, 'Visible', 'on')
+end
+plot(handles.Var_Axes, 0, 0, 'Color', Median_Plot_Color, 'LineStyle', '-')
+plot(handles.Var_Axes, 0, 0, 'Color', Box_Plot_Color, 'Marker', OLSymbol, 'MarkerSize', OLSymbolSize, 'MarkerFaceColor', OL_Symbol_Fill, 'LineStyle', '-', 'MarkerEdgeColor', OL_Plot_Color)
+hold(handles.Var_Axes, 'off')
+Plot_BoxWhisker(handles.Var_Axes, handles.Spec_R2, 'L', Box_Plot_Color, Median_Plot_Color, OL_Plot_Color, OLSymbol, OLSymbolSize, OL_Symbol_Fill)
+
+set(handles.Var_Axes, 'Xlim', [0, handles.EM_Max+1], 'YLim', [0.3, 1.01], 'XTick', 1:1:handles.EM_Max, 'XTickLabel', 1:1:handles.EM_Max);
+if ~isempty(handles.EM_R2)
+    hleg = legend(handles.Var_Axes, 'Data set', 'EM correlation', 'Specimen median', 'Specimen box & whisker', 'Location', 'SouthEast');
+else
+    hleg = legend(handles.Var_Axes, 'Data set', 'Specimen median', 'Specimen box & whisker', 'Location', 'SouthEast');
+end
+set(hleg, 'FontUnits', FUnits, 'FontSize', FontSize3);
+
+set(get(handles.Var_Axes, 'XLabel'), 'String', 'Number of end members', 'FontUnits', FUnits, 'FontSize', FontSize1);
+set(get(handles.Var_Axes, 'YLabel'), 'String', 'R^2', 'FontUnits', FUnits, 'FontSize', FontSize1);
+set(get(handles.Var_Axes, 'Title'), 'String', 'Linear Correlations', 'FontUnits', FUnits, 'FontSize', FontSize2);
+
+
+% Update the angular dev plot
+plot(handles.Angle_Axes, handles.DataSet_Angle, 'Color', Data_Plot_Color', 'Marker', DataSymbol, 'MarkerSize', DataSymbolSize, 'MarkerFaceColor', Data_Symbol_Fill, 'LineStyle', '-', 'LineWidth', 2)
+hold(handles.Angle_Axes, 'on')
+plot(handles.Angle_Axes, -1, 0, 'Color', Median_Plot_Color, 'LineStyle', '-')
+plot(handles.Angle_Axes, -1, 0, 'Color', Box_Plot_Color, 'Marker', OLSymbol, 'MarkerSize', OLSymbolSize, 'MarkerFaceColor', OL_Symbol_Fill, 'LineStyle', '-', 'MarkerEdgeColor', OL_Plot_Color)
+hold(handles.Angle_Axes, 'off')
+Plot_BoxWhisker(handles.Angle_Axes, handles.Spec_Angle, 'U', Box_Plot_Color, Median_Plot_Color, OL_Plot_Color, OLSymbol, OLSymbolSize, OL_Symbol_Fill)
+
+set(handles.Angle_Axes, 'Xlim', [0, handles.EM_Max+1], 'YLim', [0, 15], 'XTick', 1:1:handles.EM_Max, 'XTickLabel', 1:1:handles.EM_Max);
+hleg = legend(handles.Angle_Axes, 'Mean Angle', 'Specimen median', 'Specimen box & whisker', 'Location', 'NorthEast');
+set(hleg, 'FontUnits', FUnits, 'FontSize', FontSize3);
+
+set(get(handles.Angle_Axes, 'XLabel'), 'String', 'Number of end members', 'FontUnits', FUnits, 'FontSize', FontSize1);
+set(get(handles.Angle_Axes, 'YLabel'), 'String', 'Angle (degrees)', 'FontUnits', FUnits, 'FontSize', FontSize1);
+set(get(handles.Angle_Axes, 'Title'), 'String', 'Angular Deviation', 'FontUnits', FUnits, 'FontSize', FontSize2);
+
+
+% Reset the button down functions
+set(handles.Var_Axes, 'ButtonDownFcn', {@Var_Axes_ButtonDownFcn, handles});
+set(handles.Angle_Axes, 'ButtonDownFcn', {@Angle_Axes_ButtonDownFcn, handles});
 
 
 function Set_Var_Levels(handles)
@@ -439,10 +488,10 @@ for ii = 1:length(C);
     set(C(ii),'LineWidth',1);
 end
 
-if handles.Version >= 8.4 % change symbol for buggy version (2014b and later)
-    Mk = get(newAxes2.Children, 'Marker');
-    set(newAxes2.Children(strcmpi(Mk, 'o')==1), 'Marker', 's');
-end
+% if handles.Version >= 8.4 % change symbol for buggy version (2014b and later)
+%     Mk = get(newAxes2.Children, 'Marker');
+%     set(newAxes2.Children(strcmpi(Mk, 'o')==1), 'Marker', 's');
+% end
 
 print(tmpFig, '-depsc', strcat(path, file));
 close(tmpFig);
@@ -454,3 +503,44 @@ function DB_Me_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 keyboard
+
+
+% --------------------------------------------------------------------
+function MB_Set_Sel_EM_Symbols_Callback(hObject, eventdata, handles)
+% hObject    handle to MB_Set_Sel_EM_Symbols (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+Return_Data = SelectEM_Plot_Set_Symbols(handles.MainWindow, handles.Select_EM_Figure);
+
+if Return_Data.CancelFlag == 1
+    return;
+end
+
+% keyboard
+
+% Update the defaults
+handles.Defaults = Return_Data.Defaults;
+setappdata(handles.MainWindow, 'Defaults', handles.Defaults);
+
+guidata(hObject,handles);
+
+% Update the plots
+Update_Plots(handles)
+
+
+% --- Executes on mouse press over axes background.
+function Var_Axes_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to Var_Axes (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+PopOutFigure(handles.Var_Axes, 'End Member Model Correlations')
+
+% --- Executes on mouse press over axes background.
+function Angle_Axes_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to Angle_Axes (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+PopOutFigure(handles.Angle_Axes, 'End Member Model Angular Deviations')

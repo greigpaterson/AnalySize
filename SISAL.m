@@ -15,7 +15,7 @@ function [M] = SISAL(X, k)
 %
 %
 % Note:
-% The is a modification of the SISAL funtion written by Jos? Bioucas-Dias. 
+% The is a modification of the SISAL funtion written by Jose Bioucas-Dias. 
 % The original code was downloaded from (http://www.lx.it.pt/~bioucas/code.htm).
 % This script has a separate licence agreement.
 % All modifications were made by Greig A. Paterson.
@@ -51,7 +51,7 @@ X = X0';
 
 %% Set up some defaults
 % maximum number of quadratic QPs
-MaxIter = 1e2;
+MaxIter = 200;
 
 % soft constraint regularization parameter
 % Lager values of tau result in simplex expansion

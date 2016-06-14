@@ -22,7 +22,7 @@ function varargout = CM_Plot(varargin)
 
 % Edit the above text to modify the response to help CM_Plot
 
-% Last Modified by GUIDE v2.5 13-May-2015 18:31:30
+% Last Modified by GUIDE v2.5 08-Jun-2016 15:43:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -148,6 +148,7 @@ function CB_LogY_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of CB_LogY
 Update_Plot(handles)
 
+
 % --- Executes on button press in Set_Symbols.
 function Set_Symbols_Callback(hObject, eventdata, handles)
 % hObject    handle to Set_Symbols (see GCBO)
@@ -220,10 +221,12 @@ if get(handles.CB_LogY, 'Value') == 1
     set(handles.CM_Axes, 'YScale', 'Log');
 end
 
-
 set(get(handles.CM_Axes, 'XLabel'), 'String', 'M (\mu{m})', 'FontUnits', FUnits, 'FontSize', FontSize1)
 set(get(handles.CM_Axes, 'YLabel'), 'String', 'C (\mu{m})', 'FontUnits', FUnits, 'FontSize', FontSize1);
 set(get(handles.CM_Axes, 'Title'), 'String', 'Passega''s CM Plot', 'FontUnits', FUnits, 'FontSize', FontSize2);
+
+% Reset the button down functions
+set(handles.CM_Axes, 'ButtonDownFcn', {@CM_Axes_ButtonDownFcn, handles});
 
 
 % --- Executes on button press in Save_Plot.
@@ -315,3 +318,12 @@ fprintf(fout, fmt1, Header{:});
 fprintf(fout, fmt2, Data{:});
 
 fclose(fout);
+
+
+% --- Executes on mouse press over axes background.
+function CM_Axes_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to CM_Axes (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+PopOutFigure(handles.CM_Axes, 'CM Plot Figure')

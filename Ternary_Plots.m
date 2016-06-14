@@ -22,7 +22,7 @@ function varargout = Ternary_Plots(varargin)
 
 % Edit the above text to modify the response to help Ternary_Plots
 
-% Last Modified by GUIDE v2.5 10-May-2015 13:36:30
+% Last Modified by GUIDE v2.5 13-Jun-2016 18:19:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -150,6 +150,9 @@ switch contents{get(hObject,'Value')}
         Set_Folk_Coarse(handles);
 end
 
+% Reset the button down function
+set(handles.Tern_Axes, 'ButtonDownFcn', {@Tern_Axes_ButtonDownFcn, handles});
+
 
 % --- Executes during object creation, after setting all properties.
 function Plot_Select_CreateFcn(hObject, eventdata, handles)
@@ -231,6 +234,9 @@ patch('xdata', [0 1 0.5 0], 'ydata', [0 0 sin(1/3*pi) 0], ...
     'handlevisibility','off');
 
 set(handles.Tern_Axes, 'Xlim', [-0.05, 1.05], 'YLim', [-0.05, 0.935]);
+
+% Reset the button down function
+set(handles.Tern_Axes, 'ButtonDownFcn', {@Tern_Axes_ButtonDownFcn, handles});
 
 
 function Pcts = Get_GS_Fractions(handles)
@@ -388,10 +394,13 @@ plot(handles.Tern_Axes, Data_x, Data_y, handles.Plot_Symbol,...
     'color', handles.Symbol_Color, 'MarkerSize', handles.Symbol_Size, 'MarkerFaceColor', handles.Face_Color);
 hold(handles.Tern_Axes, 'off')
 
+% Reset the button down function
+set(handles.Tern_Axes, 'ButtonDownFcn', {@Tern_Axes_ButtonDownFcn, handles});
+
 
 function Set_Shepard_Coarse(handles)
 %
-% Plot the Shepard fines plot
+% Plot the Shepard Coarse plot
 %
 
 set(handles.Gravel_Warning,'Visible', 'Off');
@@ -439,12 +448,14 @@ plot(handles.Tern_Axes, Data_x, Data_y, handles.Plot_Symbol,...
     'color', handles.Symbol_Color, 'MarkerSize', handles.Symbol_Size, 'MarkerFaceColor', handles.Face_Color);
 hold(handles.Tern_Axes, 'off')
 
+% Reset the button down function
+set(handles.Tern_Axes, 'ButtonDownFcn', {@Tern_Axes_ButtonDownFcn, handles});
+
 
 function Set_Folk_Fine(handles)
 %
-% Plot the Shepard fines plot
+% Plot the Folk fines plot
 %
-
 
 if handles.Max_Gravel > 0.01
     MSG = [{'Some specimens contain more than 0.01% gravel'}, {'These have been removed from the fines plot'}, ...
@@ -541,10 +552,13 @@ plot(handles.Tern_Axes, Data_x, Data_y, handles.Plot_Symbol,...
     'color', handles.Symbol_Color, 'MarkerSize', handles.Symbol_Size, 'MarkerFaceColor', handles.Face_Color);
 hold(handles.Tern_Axes, 'off')
 
+% Reset the button down function
+set(handles.Tern_Axes, 'ButtonDownFcn', {@Tern_Axes_ButtonDownFcn, handles});
+
 
 function Set_Folk_Coarse(handles)
 %
-% Plot the Shepard fines plot
+% Plot the Folk coarse plot
 %
 
 set(handles.Gravel_Warning,'Visible', 'Off');
@@ -663,6 +677,9 @@ plot(handles.Tern_Axes, Data_x, Data_y, handles.Plot_Symbol,...
 hold(handles.Tern_Axes, 'off')
 % Set_Labels('Gravel', 'Sand', 'Mud')
 
+% Reset the button down function
+set(handles.Tern_Axes, 'ButtonDownFcn', {@Tern_Axes_ButtonDownFcn, handles});
+
 
 % --- Executes on button press in debug_mode.
 function debug_mode_Callback(hObject, eventdata, handles)
@@ -766,3 +783,21 @@ Data_Out = [handles.All_Names, num2cell(100.*handles.GS_Fractions)]';
 fprintf(fout, fmt2, Data_Out{:});
 
 fclose(fout);
+
+
+% --- Executes on mouse press over axes background.
+function Tern_Axes_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to Tern_Axes (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+PopOutFigure(handles.Tern_Axes, 'Ternary Diagram')
+
+
+% --- Executes on button press in PB_New_Fig.
+function PB_New_Fig_Callback(hObject, eventdata, handles)
+% hObject    handle to PB_New_Fig (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+PopOutFigure(handles.Tern_Axes, 'Ternary Diagram')
