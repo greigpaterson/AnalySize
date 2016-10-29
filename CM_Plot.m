@@ -92,7 +92,7 @@ handles.GS = DataTransfer.GS;
 handles.All_Names = DataTransfer.Names;
 
 % Get the C and M values
-handles.Cvals = GetPercentile(handles.Data, handles.GS', 1);
+handles.Cvals = GetPercentile(handles.Data, handles.GS', 99);
 handles.Mvals = GetPercentile(handles.Data, handles.GS', 50);
 
 % Get the default plot symbols

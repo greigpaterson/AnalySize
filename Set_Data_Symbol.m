@@ -55,20 +55,34 @@ function Set_Data_Symbol_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for Set_Data_Symbol
 handles.output = hObject;
 
-DataTransfer = find(strcmp(varargin, 'DataTransfer'));
-if (isempty(DataTransfer)) ...
-        || (length(varargin) <= DataTransfer)% ...
+
+if nargin < 1
     
     disp('------------------------------------------');
     disp('If you see this, something has gone wrong.')
     disp('      Please contact Greig Paterson       ')
     disp('------------------------------------------');
+    
 else
-    DataTransfer = varargin{DataTransfer+1};
-    handles.MainWindow = varargin{3};
-    handles.Defaults = getappdata(varargin{3}, 'Defaults');
-    handles.MainWindow = varargin{4};
+%     DataTransfer = varargin{DataTransfer+1};
+    handles.MainWindow = varargin{1};
+    handles.Defaults = getappdata(varargin{1}, 'Defaults');
 end
+
+% DataTransfer = find(strcmp(varargin, 'DataTransfer'));
+% if (isempty(DataTransfer)) ...
+%         || (length(varargin) <= DataTransfer)% ...
+%     
+%     disp('------------------------------------------');
+%     disp('If you see this, something has gone wrong.')
+%     disp('      Please contact Greig Paterson       ')
+%     disp('------------------------------------------');
+% else
+%     DataTransfer = varargin{DataTransfer+1};
+%     handles.MainWindow = varargin{3};
+%     handles.Defaults = getappdata(varargin{3}, 'Defaults');
+%     handles.MainWindow = varargin{4};
+% end
 
 % Position to be relative to parent:
 parentPosition = get(handles.MainWindow, 'Position');
@@ -81,29 +95,32 @@ newH = currentPosition(4);
 set(hObject, 'Position', [newX, newY, newW, newH]);
 
 
+Defaults = handles.Defaults;
+
+
 % Get the data from previous window
-handles.Plot_Symbol = DataTransfer.Plot_Symbol;
-handles.Symbol_Size = DataTransfer.Symbol_Size;
-handles.Symbol_Color = DataTransfer.Symbol_Color;
-handles.Face_Color = DataTransfer.Face_Color;
+% handles.Plot_Symbol = Defaults.Plot_Symbol;
+% handles.Symbol_Size = Defaults.Symbol_Size;
+% handles.Symbol_Color = Defaults.Symbol_Color;
+% handles.Face_Color = Defaults.Face_Color;
 
 handles.All_Symbols = {'^', 'o', 'd', '*', 's', '.', '+'};
 
 % Get the input symbol propoerties to set the deafults
 % set the radiobutton
-Symb_ind=find(strcmpi(handles.Plot_Symbol, handles.All_Symbols));
+Symb_ind=find(strcmpi(handles.Defaults.DataSymbol, handles.All_Symbols));
 Symb_Name = strcat('Sym', sprintf('%d', Symb_ind));
 set(handles.(Symb_Name), 'Value', 1);
 
 % Set the filled checkbox
-if strcmpi(handles.Face_Color, 'none')
+if strcmpi(handles.Defaults.DataFaceColor, 'none')
     set(handles.CB_Filled, 'Value', 0);
 else
     set(handles.CB_Filled, 'Value', 1);
 end
 
 % Set the symbol size
-set(handles.Size_Select, 'Value', handles.Symbol_Size - 4 );
+set(handles.Size_Select, 'Value', handles.Defaults.DataSymbolSize - 2 );
 
 % Update handles structure
 guidata(hObject, handles);
@@ -126,26 +143,35 @@ varargout{1} = handles.output;
 
 delete(hObject);
 
+
 % --- Executes on button press in OK.
 function OK_Callback(hObject, eventdata, handles)
 % hObject    handle to OK (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-Return.CancelFlag = 0;
-Return.Plot_Symbol = handles.Plot_Symbol;
-Return.Symbol_Size = handles.Symbol_Size;
-Return.Symbol_Color = handles.Symbol_Color;
+% Return.CancelFlag = 0;
+% Return.Plot_Symbol = handles.Plot_Symbol;
+% Return.Symbol_Size = handles.Symbol_Size;
+% Return.Symbol_Color = handles.Symbol_Color;
+% 
+% if get(handles.CB_Filled,'Value')
+%     Return.Face_Color = handles.Symbol_Color;
+% else
+%     Return.Face_Color = 'none';
+% end
+% 
+% handles.output = Return;
+% guidata(hObject,handles);
 
-if get(handles.CB_Filled,'Value')
-    Return.Face_Color = handles.Symbol_Color;
-else
-    Return.Face_Color = 'none';
-end
+
+
+% Create a return structure
+Return.CancelFlag = 0;
+Return.Defaults = handles.Defaults;
 
 handles.output = Return;
 guidata(hObject,handles);
-
 uiresume(handles.Set_Data_Symbol_Fig);
 
 
@@ -160,6 +186,7 @@ handles.output = Return;
 guidata(hObject,handles);
 
 uiresume(handles.Set_Data_Symbol_Fig);
+
 
 % --- Executes when user attempts to close Set_Data_Symbol_Fig.
 function Set_Data_Symbol_Fig_CloseRequestFcn(hObject, eventdata, handles)
@@ -183,7 +210,7 @@ function Set_Color_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get the new color
-handles.Symbol_Color = uisetcolor(handles.Symbol_Color);
+handles.Defaults.Data_Plot_Color = uisetcolor(handles.Defaults.Data_Plot_Color);
 guidata(hObject, handles);
 
 % Update the plot
@@ -192,11 +219,13 @@ Update_Plot(handles)
 
 function Update_Plot(handles)
 
-Color = handles.Symbol_Color;
-Size = handles.Symbol_Size;
+Defaults = handles.Defaults;
 
-% Check for filled
-if get(handles.CB_Filled,'Value')
+Color = Defaults.Data_Plot_Color;
+Size = Defaults.DataSymbolSize;
+FaceColor = Defaults.DataFaceColor;
+
+if strcmpi(FaceColor, 'filled')
     FaceColor = Color;
 else
     FaceColor = 'none';
@@ -226,7 +255,7 @@ function Size_Select_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from Size_Select
 
 contents = cellstr(get(hObject,'String'));
-handles.Symbol_Size = str2double(contents{get(hObject,'Value')});
+handles.Defaults.DataSymbolSize = str2double(contents{get(hObject,'Value')});
 
 guidata(hObject, handles);
 
@@ -255,6 +284,14 @@ function CB_Filled_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of CB_Filled
 
+if get(hObject,'Value') == 1
+    handles.Defaults.DataFaceColor = 'filled';
+else
+    handles.Defaults.DataFaceColor = 'none';
+end
+
+guidata(hObject, handles);
+
 % Update the plot
 Update_Plot(handles)
 
@@ -278,19 +315,19 @@ function Symbol_Select_SelectionChangeFcn(hObject, eventdata, handles)
 
 switch get(eventdata.NewValue,'Tag') % Get Tag of selected object.
     case 'Sym1'
-        handles.Plot_Symbol = '^';
+        handles.Defaults.DataSymbol = '^';
     case 'Sym2'
-        handles.Plot_Symbol = 'o';
+        handles.Defaults.DataSymbol = 'o';
     case 'Sym3'
-        handles.Plot_Symbol = 'd';
+        handles.Defaults.DataSymbol = 'd';
     case 'Sym4'
-        handles.Plot_Symbol = '*';
+        handles.Defaults.DataSymbol = '*';
     case 'Sym5'
-        handles.Plot_Symbol = 's';
+        handles.Defaults.DataSymbol = 's';
     case 'Sym6'
-        handles.Plot_Symbol = '.';
+        handles.Defaults.DataSymbol = '.';
     case 'Sym7'
-        handles.Plot_Symbol = '+';
+        handles.Defaults.DataSymbol = '+';
 end
 
 guidata(hObject, handles);
@@ -303,17 +340,6 @@ function Set_Default_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 Defaults = handles.Defaults;
-
-
-Defaults.DataSymbol = handles.Plot_Symbol;
-Defaults.DataSymbolSize = handles.Symbol_Size;
-Defaults.Data_Plot_Color = handles.Symbol_Color;
-
-if get(handles.CB_Filled,'Value')
-    Defaults.DataFaceColor = 'filled';
-else
-    Defaults.DataFaceColor = handles.Face_Color;
-end
 
 % Save them
 Save_User_Defaults(Defaults);

@@ -64,8 +64,8 @@ handles.output = hObject;
 Ver = ver('MATLAB');
 handles.Version = str2double(Ver.Version);
 
-handles.AnalySize_Version = '1.1.0';
-handles.AnalySize_Date = '14/06/2016';
+handles.AnalySize_Version = '1.1.1';
+handles.AnalySize_Date = '29/10/2016';
 
 handles.Curent_Pos = get(handles.AnalySize_MW, 'Position');
 
@@ -164,6 +164,7 @@ function varargout = AnalySize_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
+
 
 % --- Executes when user attempts to close AnalySize_MW.
 function AnalySize_MW_CloseRequestFcn(hObject, eventdata, handles)
@@ -1489,6 +1490,12 @@ function MB_Save_Session_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+if handles.Data_Loaded == 0
+    % No data loaded so do nothing
+    warndlg('No data currently loaded.', 'No Data', 'modal')
+    return;
+end
+
 SaveSession(handles);
 
 % --------------------------------------------------------------------
@@ -1868,32 +1875,14 @@ function MB_Set_Data_Symbols_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-Defaults = getappdata(handles.AnalySize_MW, 'Defaults');
-
-
-Transfer.Plot_Symbol = Defaults.DataSymbol;
-Transfer.Symbol_Size = Defaults.DataSymbolSize;
-Transfer.Symbol_Color = Defaults.Data_Plot_Color;
-Transfer.Face_Color = Defaults.DataFaceColor;
-
-Return_Data = Set_Data_Symbol('DataTransfer', Transfer, handles.AnalySize_MW, handles.AnalySize_MW);
+Return_Data = Set_Data_Symbol(handles.AnalySize_MW);
 
 if Return_Data.CancelFlag == 1
     return;
 end
 
-% Save the changes to session defaults
-
-Defaults.DataSymbol = Return_Data.Plot_Symbol;
-Defaults.DataSymbolSize = Return_Data.Symbol_Size;
-Defaults.Data_Plot_Color = Return_Data.Symbol_Color;
-
-if strcmpi(Return_Data.Face_Color, 'none')
-    Defaults.DataFaceColor = Return_Data.Face_Color;
-else
-    Defaults.DataFaceColor = 'filled';
-end
-
+% Update the defaults
+Defaults = Return_Data.Defaults;
 setappdata(handles.AnalySize_MW, 'Defaults', Defaults);
 
 % Get the defaults needed for the main window
