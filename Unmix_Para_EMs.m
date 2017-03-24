@@ -55,9 +55,11 @@ switch Fit_Type
         
     case 'SGG'
         % Impose a limit for the absoulte value of q - this limits the search space to realistic values
-        qlim = 0.25;
-        
-        Params(abs(Params(:,3)) < qlim, 3) = sign(Params(abs(Params(:,3)) < qlim, 3)) .* Params(abs(Params(:,3)) < qlim, 3);
+%         qlim = 0.25;
+%         
+%         Params(abs(Params(:,3)) < qlim, 3) = sign(Params(abs(Params(:,3)) < qlim, 3)) .* Params(abs(Params(:,3)) < qlim, 3);
+
+% Params(:,3) = abs(Params(:,3));
         tmp_p =  2 + 6.*(1-Params(:,3)).^5;
 
      for ii=1:k
@@ -97,8 +99,16 @@ if any(sum(EM,2) == 0)
                 [tmp_A, Xprime, Validity] = ProjectToSimplex(X, EM(~Z_inds,:));
             case 'FCLS'
                 [tmp_A, Xprime] = Get_FCLS(X, EM(~Z_inds,:));
-                Validity = NaN;
+                Validity = 1;
         end
+        
+        if Validity ~=1
+            % Projection to simplex solution not valid
+            % Do FCLS
+            [A, Xprime] = Get_FCLS(X, EM(~Z_inds,:));
+            Validity = 1;
+        end
+        
         
         A(:,~Z_inds) = tmp_A;
         A(:,Z_inds) = zeros(size(A,1),sum(Z_inds));
@@ -111,8 +121,16 @@ else
             [A, Xprime, Validity] = ProjectToSimplex(X, EM);
         case 'FCLS'
             [A, Xprime] = Get_FCLS(X, EM);
-            Validity = NaN;
+            Validity = 1;
     end
+    
+    if Validity ~=1
+        % Projection to simplex solution not valid
+        % Do FCLS
+        [A, Xprime] = Get_FCLS(X, EM);
+        Validity = 1;
+    end
+    
 end
 
 % on the final check using abundance limit
@@ -129,7 +147,14 @@ if nargin == 7
                 [A, Xprime, Validity] = ProjectToSimplex(X, EM);
             case 'FCLS'
                 [A, Xprime] = Get_FCLS(X, EM);
-                Validity = NaN;
+                Validity = 1;
+        end
+        
+        if Validity ~=1
+            % Projection to simplex solution not valid
+            % Do FCLS
+            [A, Xprime] = Get_FCLS(X, EM);
+            Validity = 1;
         end
         
     end

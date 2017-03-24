@@ -59,7 +59,7 @@ switch Fit_Type
         
         % A lower bound on |q| is imposed in Unmix_Para_EMs.m to kept 
         % realistc values of p after the maximum entropy transformation
-        Lower = repmat([min(LGS(NZi)), min(abs(diff(LGS(NZi)))), -1], kmax,1);
+        Lower = repmat([min(LGS(NZi)), min(abs(diff(LGS(NZi)))), -0.25], kmax,1);
         Upper = repmat([max(LGS(NZi)), max(LGS(NZi)) - min(LGS(NZi)), 1], kmax,1);
         
         % reduce the scale parameter by 2*k
@@ -111,6 +111,12 @@ for ii = kmin:kmax
         
         % Process the maxima
         Pos2Neg_inds = find(SP==-2);
+        
+        if isempty(Pos2Neg_inds)
+            % No transition in the second derivative
+            % Simply take the maximum value of the end member
+            Pos2Neg_inds = find( tmp_EM(ii,:) == max(tmp_EM(ii,:)) );
+        end
         
         tmp_X = mean([tmp_EM(jj,Pos2Neg_inds)', tmp_EM(jj,Pos2Neg_inds+1)'], 2);
         tmp_GS = mean([LGS(Pos2Neg_inds), LGS(Pos2Neg_inds+1)], 2);

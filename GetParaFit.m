@@ -105,6 +105,7 @@ if Flag == 0
     
     % Set options for the search
     options=optimset('MaxIter', 1e4, 'MaxFun', 1e4, 'TolX', 1e-4, 'TolFun', 1e-4, 'Display', 'off');
+%     options=optimset('MaxIter', 1e4, 'MaxFun', 1e4, 'TolX', 1e-8, 'TolFun', 1e-8, 'Display', 'off');
     
     % Check for Cancel button press
     if getappdata(h,'Cancelled')
@@ -131,6 +132,7 @@ if Flag == 0
         
         % Check the validity and if not do FCLS
         if Validity ~=1
+            warning('GetParaFit:Validity', 'As of v1.1.1, you should not see this message. If so, please report it as a bug.');
             [MisFit, Xprime, tmp_EM] = Unmix_Para_EMs(X, GS, k, Fit_Type, Params, 'FCLS');
         end
         

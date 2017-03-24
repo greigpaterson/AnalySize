@@ -34,9 +34,15 @@ nPvals = length(pvals);
 y = NaN(nData, nPvals);
 
 for ii = 1:nData
+        
     for jj = 1:nPvals
-        inds = [find(XCS(ii,:) < pvals(jj), 1, 'last'), find(XCS(ii,:) > pvals(jj), 1, 'first')];
-        y(ii,jj) = interp1(XCS(ii,inds), GS(inds), pvals(jj));
+        
+        try
+            inds = [find(XCS(ii,:) < pvals(jj), 1, 'last'), find(XCS(ii,:) > pvals(jj), 1, 'first')];
+            y(ii,jj) = interp1(XCS(ii,inds), GS(inds), pvals(jj));
+        catch
+            y(ii,jj) = 0;
+        end
     end
 end
 

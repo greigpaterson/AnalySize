@@ -64,8 +64,8 @@ handles.output = hObject;
 Ver = ver('MATLAB');
 handles.Version = str2double(Ver.Version);
 
-handles.AnalySize_Version = '1.1.1';
-handles.AnalySize_Date = '29/10/2016';
+handles.AnalySize_Version = '1.1.2';
+handles.AnalySize_Date = '24/03/2017';
 
 handles.Curent_Pos = get(handles.AnalySize_MW, 'Position');
 
@@ -317,8 +317,14 @@ switch Plot_Type
         set(get(handles.PDF_Axes, 'Title'), 'String', handles.All_Names{handles.spec_ind}, 'FontUnits', FUnits, 'FontSize', FontSize2);
 end
 
-set(handles.PDF_Axes, 'ColorOrder', handles.Default_Plot_Colors);
-
+% Set the default color order for the PDF plot
+% Do a MATLAB version check
+if handles.Version <= 8.3 % 2014a and before
+    set(handles.PDF_Axes, 'ColorOrder',handles.Default_Plot_Colors);
+else
+    % add black to top for the total PDF fit
+    set(handles.PDF_Axes, 'ColorOrder', [[0 0 0]; handles.Default_Plot_Colors]);
+end
 
 if Plot_Fits==1
     
@@ -334,7 +340,7 @@ if Plot_Fits==1
     tmp_r2 = handles.Specimen_QFit(handles.spec_ind,1);
     tmp_theta = handles.Specimen_QFit(handles.spec_ind,2);
     
-    MSG = [handles.All_Names{handles.spec_ind}, '; R^2 = ', sprintf('%2.3f', tmp_r2), ', Theta = ', sprintf('%2.3f', tmp_theta)];
+    MSG = [sprintf('%g', handles.All_Names{handles.spec_ind}), '; R^2 = ', sprintf('%2.3f', tmp_r2), ', Theta = ', sprintf('%2.3f', tmp_theta)];
     set(get(handles.PDF_Axes, 'Title'), 'Interpreter', 'none');
     set(get(handles.PDF_Axes, 'Title'), 'String', MSG, 'FontUnits', FUnits, 'FontSize', FontSize2);
     
