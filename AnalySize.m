@@ -340,7 +340,16 @@ if Plot_Fits==1
     tmp_r2 = handles.Specimen_QFit(handles.spec_ind,1);
     tmp_theta = handles.Specimen_QFit(handles.spec_ind,2);
     
-    MSG = [sprintf('%g', handles.All_Names{handles.spec_ind}), '; R^2 = ', sprintf('%2.3f', tmp_r2), ', Theta = ', sprintf('%2.3f', tmp_theta)];
+    % Check the specimen name and format correctly
+    if isnumeric(handles.All_Names{handles.spec_ind});
+        MSG = [sprintf('%g', handles.All_Names{handles.spec_ind}), '; R^2 = ', sprintf('%2.3f', tmp_r2), ', Theta = ', sprintf('%2.3f', tmp_theta)];
+    elseif ischar(handles.All_Names{handles.spec_ind})
+        MSG = [handles.All_Names{handles.spec_ind}, '; R^2 = ', sprintf('%2.3f', tmp_r2), ', Theta = ', sprintf('%2.3f', tmp_theta)];
+    else
+        warning('AnalySize:SpecimenName', 'The specimen name may not appear correctly. If not please contact Greig Paterson.');
+        MSG = [sprintf('%g', handles.All_Names{handles.spec_ind}), '; R^2 = ', sprintf('%2.3f', tmp_r2), ', Theta = ', sprintf('%2.3f', tmp_theta)];
+    end
+    
     set(get(handles.PDF_Axes, 'Title'), 'Interpreter', 'none');
     set(get(handles.PDF_Axes, 'Title'), 'String', MSG, 'FontUnits', FUnits, 'FontSize', FontSize2);
     
