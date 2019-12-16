@@ -172,27 +172,53 @@ function AnalySize_MW_CloseRequestFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-choice = questdlg('Do you want to save before quitting?', 'Save Session?', 'Yes', 'No', 'Cancel', 'Cancel');
 
-if strcmpi(choice, 'Yes')
-    MB_Save_Session_Callback(hObject, eventdata, handles);
-end
-
-if strcmpi(choice, 'Cancel')
-    return;
-else
+if handles.Data_Loaded ~= 0
     
-    nWindows = size(handles.WindowNames, 1);
+    choice = questdlg('Do you want to save before quitting?', 'Save Session?', 'Yes', 'No', 'Cancel', 'Cancel');
     
-    for ii = 1:nWindows
-        h = findall(0,'type','figure', 'name', handles.WindowNames{ii});
-        close(h);
+    if strcmpi(choice, 'Yes')
+        MB_Save_Session_Callback(hObject, eventdata, handles);
     end
     
-    % Hint: delete(hObject) closes the figure
-    delete(hObject);
+    if strcmpi(choice, 'Cancel')
+        return;
+    else
+        nWindows = size(handles.WindowNames, 1);
+        
+        for ii = 1:nWindows
+            h = findall(0,'type','figure', 'name', handles.WindowNames{ii});
+            close(h);
+        end
+        
+        delete(hObject);
+    end
+    
+    
+else
+    % No data loaded, just ask to quit or not
+    choice = questdlg('Do you want to quit?', 'Quite AnalySize?', 'Yes', 'No', 'No');
+    
+    if strcmpi(choice, 'Yes')
+        
+        nWindows = size(handles.WindowNames, 1);
+        
+        for ii = 1:nWindows
+            h = findall(0,'type','figure', 'name', handles.WindowNames{ii});
+            close(h);
+        end
+        
+        delete(hObject);
+        
+    else
+        return;
+    end
     
 end
+
+
+
+    
 
 
 
@@ -1805,8 +1831,29 @@ guidata(hObject, handles);
 
 
 % --------------------------------------------------------------------
+function MB_Open_Manual_Callback(hObject, eventdata, handles)
+% hObject    handle to MB_Open_Manual (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get the current path of the main m-file
+S = mfilename('fullpath');
+name_len = length(mfilename());
+MyPath = S(1:end-name_len);
+
+file_name = strcat('AnalySize_Manual_v', handles.AnalySize_Version, '.pdf');
+file_path = strcat(MyPath, 'Documents/', file_name);
+
+try
+    open(file_path);
+catch
+    warndlg([file_name, ' not found.'], 'Manual Not Found');
+end
+
+
+% --------------------------------------------------------------------
 function MB_About_AnalySize_Callback(hObject, eventdata, handles)
-% hObject    handle to MB_About (see GCBO)
+% hObject    handle to MB_Help (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
