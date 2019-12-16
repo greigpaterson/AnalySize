@@ -32,8 +32,17 @@ if FigExist == 0
     
     % Make a new figure
     tmpFig = figure('Name', FigName, 'Visible', 'on', 'Units', 'Pixels','PaperPositionMode','auto');
-    oldPos = get(tmpFig, 'Position');
-    set(tmpFig, 'Position', [oldPos(1), oldPos(2), 500, 500]);
+    
+    % Set the postion relative to the parent window
+    pPos = get(get(AxisHandle, 'Parent'), 'Position');
+    xPos = round(pPos(1) + pPos(3)./2 - 250);
+    yPos = round(pPos(2) + pPos(4)./2 - 250);
+    
+    set(tmpFig, 'Position', [xPos, yPos, 500, 500]);
+    
+    % Set position to defaul new fig position
+    %         oldPos = get(tmpFig, 'Position');
+    %     set(tmpFig, 'Position', [oldPos(1), oldPos(2), 500, 500]);
     
     NewPos = [60, 60, 400, 400];
     Units = 'Pixels';
@@ -65,3 +74,4 @@ newAxes = copyobj(AxisHandle, tmpFig);
 % Adjust the axes and reset the units to normalized for scaling
 set(newAxes, 'ButtonDownFcn', '', 'Units', Units, 'Position', NewPos);
 set(newAxes, 'Units', 'Normalized', 'Tag', FigName);
+
