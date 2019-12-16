@@ -174,7 +174,7 @@ else
     GS = handles.GS;
     
     % Get a logical array of indices to exclude
-    inds = (GS(:,1) > handles.GS_Min & GS(:,1) < handles.GS_Max);
+    inds = (GS(:,1) >= handles.GS_Min & GS(:,1) <= handles.GS_Max);
     
     % Set the data to return
     Return.All_Data = cellfun(@(x) x(~inds), All_Data, 'UniformOutput', 0); % Remove the indices
