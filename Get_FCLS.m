@@ -12,7 +12,7 @@ function [Abunds, EM_Fit] = Get_FCLS(X, E)
 % Note: rows of both X and E must sum to ones
 %
 % Output:
-%        Abdunds - nData x nEnd matrix of end member abundances
+%        Abunds - nData x nEnd matrix of end member abundances
 %        EM_Fit - nData x nVar matrix of the fitted end members (EM_Fit = A*E)
 %
 % References:

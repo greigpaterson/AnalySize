@@ -13,6 +13,8 @@ function [MisFit, Xprime, EM, A, Validity] = Unmix_Para_EMs(X, GS, k, Fit_Type, 
 %                   Either 'Projection" for the SPU algorithm of [1], or 
 %                   'FCLS' for the fully constrained least squares 
 %                   algorithm of [2].
+%       Abund_Lim - A limit on the minimum abundace. EMs with abundance
+%                   below this threshold are removed (NOT USED IN ANALYSIZE)
 %
 % Output:
 %       MisFit - the Forbenius norm of X-Xprime
@@ -20,7 +22,10 @@ function [MisFit, Xprime, EM, A, Validity] = Unmix_Para_EMs(X, GS, k, Fit_Type, 
 %                (Normalized to sum-to-one)
 %       EMs - k x nVar matrix of end member vectors
 %       A - nData x k matrix of abundances
-%       Validitity - Flag to indicate the validity of the SPU solution
+%       Validitity - Flag to indicate the validity of the SPU solution 
+%                    1 indicates a valid soultuion, 0 indicates an invalid
+%                    solution and FCLS was used. Note, a value of zero is
+%                    never returned.
 %
 % References:
 %

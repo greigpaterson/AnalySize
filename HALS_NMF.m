@@ -11,6 +11,7 @@ function [EMs, Abunds, Xprime] = HALS_NMF(X, k, MaxIter, Reps, Regs, Verbose)
 %       MaxIter - the maximum number of iterations
 %       Reps - The number of repetitions of the iterative routine
 %       Regs - 4 x 1 matrix of constraint regularizers [a1, a2, b1, b2]
+%       Verbose - Flag for verbose output for testing (eiter 0, or 1)
 %
 % Outputs:
 %         EMs - k x nVar matrix of end member vectors
