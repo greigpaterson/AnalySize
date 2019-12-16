@@ -85,6 +85,24 @@ if isempty(MainWindow)
     % Set the postion
     parentPosition = Sp;
     
+    Defaults.SEM_DataFaceColor = 'none';
+    Defaults.SEM_DataSymbol = 'o';
+    Defaults.SEM_DataSymbolSize = 6;
+    Defaults.SEM_EMFaceColor = 'none';
+    Defaults.SEM_EMSymbol = '^';
+    Defaults.SEM_EMSymbolSize = 6;
+    Defaults.SEM_OLFaceColor = 'none';
+    Defaults.SEM_OLSymbol = 'x';
+    Defaults.SEM_OLSymbolSize = 6;
+    
+    Defaults.SEM_Box_Plot_Color = [0 0 1];
+    Defaults.SEM_Data_Plot_Color = [0 0 0];
+    Defaults.SEM_EM_Plot_Color = [2 2 2]./3';
+    Defaults.SEM_Median_Plot_Color = [1 0 0];
+    Defaults.SEM_Outlier_Plot_Color = [1 0 0];
+    
+    handles.Defaults = Defaults;
+    
 else
     parentPosition = get(MainWindow, 'Position');
     handles.Version = getappdata(MainWindow, 'Version');
