@@ -58,7 +58,11 @@ for ii = 1:nData
     
     % Get estimates for s and lambda, then the fully constrained
     % abundances (a_fcls)
-    s = (M'*M)\ones(size(M,2), 1);
+    if rcond(M'*M) <= sqrt(eps)
+        s = pinv(M'*M)*ones(size(M,2), 1);
+    else
+        s = (M'*M)\ones(size(M,2), 1);
+    end
     lambda_hat = (ones(1,size(M,2))*a_ls - 1)./(ones(1, size(M,2))*s);
     a_fcls = a_ls - lambda_hat*s;
     
@@ -84,7 +88,11 @@ for ii = 1:nData
         
         % Recalculate the fits
         a_ls = M\r;
-        s = (M'*M)\ones(size(M,2), 1);
+        if rcond(M'*M) <= sqrt(eps)
+            s = pinv(M'*M)*ones(size(M,2), 1);
+        else
+            s = (M'*M)\ones(size(M,2), 1);
+        end
         lambda_hat = (ones(1,size(M,2))*a_ls - 1)./(ones(1, size(M,2))*s);
         a_fcls = a_ls - lambda_hat*s;
         
