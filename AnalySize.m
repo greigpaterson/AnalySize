@@ -1597,9 +1597,30 @@ try
     Transfer.Names = handles.All_Names;
 catch
     warndlg('No data currently loaded.', 'No Data', 'modal')
+    return;
 end
 
 Spectra_Plot('DataTransfer', Transfer, handles.AnalySize_MW);
+
+
+% --------------------------------------------------------------------
+function Cum_Plot_Callback(hObject, eventdata, handles)
+% hObject    handle to Cum_Plot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+try
+    Transfer.Data = cell2mat(handles.All_Data);
+    Transfer.GS = handles.All_GS{1};
+    Transfer.Phi = handles.All_Phi{1};
+    Transfer.Names = handles.All_Names;
+catch
+    warndlg('No data currently loaded.', 'No Data', 'modal')
+    return;
+end
+
+Cumulative_Plot('DataTransfer', Transfer, handles.AnalySize_MW);
 
 
 % --------------------------------------------------------------------
@@ -1615,6 +1636,7 @@ try
     Transfer.Names = handles.All_Names;
 catch
     warndlg('No data currently loaded.', 'No Data', 'modal')
+    return;
 end
 
 Ternary_Plots('DataTransfer', Transfer, handles.AnalySize_MW);
@@ -1665,7 +1687,7 @@ function EM_Stats_Callback(hObject, eventdata, handles)
 
 
 if handles.FitStatus ~=1
-    %     warndlg('No data currently loaded.', 'No Data', 'modal')
+    warndlg('No end member fits currently loaded.', 'No EMs', 'modal')
     return;
 end
 
@@ -2001,3 +2023,4 @@ function EM_Axes_ButtonDownFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 PopOutFigure(handles.EM_Axes, 'End Members')
+
