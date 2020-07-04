@@ -246,14 +246,24 @@ function Spec_Table_CellEditCallback(hObject, eventdata, handles)
 
 Inds = eventdata.Indices(1);
 
+% Readjust table position to keep in frame
+try
+    jscrollpane = javaObjectEDT(findjobj(handles.Spec_Table));
+    viewport    = javaObjectEDT(jscrollpane.getViewport);
+    P = viewport.getViewPosition();
+    obj_fail = 0; % flag to indicate if findjobj failed or not
+catch
+    % findjobj not avaiable so resort to default behaviour
+    obj_fail = 1;
+end
+
 Tdata = get(hObject,'Data'); % get the data cell array of the table
 New_Status = Tdata{Inds,1};
 if New_Status == 1 % is true
-    Tdata{Inds, 1} = true(1); % swtich True to False
+    Tdata{Inds, 1} = true(1); % switch True to False
 else
-    Tdata{Inds, 1} = false(1); % swtich False to True
+    Tdata{Inds, 1} = false(1); % switch False to True
 end
-
 
 set(hObject,'Data',Tdata); % now set the table's data to the updated data cell array
 
@@ -268,8 +278,14 @@ if isempty(handles.Current_Data)
 end
 
 Update_Plots(handles);
-
 guidata(hObject, handles);
+
+% Restore the table position
+if obj_fail == 0
+    drawnow()
+    viewport.setViewPosition(P);
+end
+
 
 
 % --- Executes on button press in Select_All.

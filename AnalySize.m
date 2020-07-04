@@ -22,7 +22,7 @@ function varargout = AnalySize(varargin)
 
 % Edit the above text to modify the response to help AnalySize
 
-% Last Modified by Greig Paterson 15-Aug-2015
+% Last Modified by Greig Paterson 04-Jul-2020
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -215,11 +215,6 @@ else
     end
     
 end
-
-
-
-    
-
 
 
 % --- Set the current data
@@ -442,23 +437,34 @@ function Data_Table_CellSelectionCallback(hObject, eventdata, handles)
 % Get the list of currently selected table cells
 sel = eventdata.Indices;
 
-try any(sel(1,:));
+if ~isempty(sel) == 1 % The user is selecting a data row
+    selrow = sel(1,1);
     
-    if any(sel(1,:)) == 1 % The user is selecting a data row
-        selrow = sel(1,1);
-        
-        handles.spec_ind = selrow;
-        set(handles.Spec_Num, 'String', handles.All_Names{handles.spec_ind}); % set the index
-        guidata(hObject, handles);
-        
-        func_handles=Set_Current_Data(handles);
-        handles=func_handles;
-        guidata(hObject, handles);
-        
+    handles.spec_ind = selrow;
+    set(handles.Spec_Num, 'String', handles.All_Names{handles.spec_ind}); % set the index
+    guidata(hObject, handles);
+    
+    % Readjust table position to keep in frame
+    try
+        jscrollpane = javaObjectEDT(findjobj(handles.Data_Table));
+        viewport    = javaObjectEDT(jscrollpane.getViewport);
+        P = viewport.getViewPosition();
+        obj_fail = 0;  % flag to indicate if findjobj failed or not
+    catch
+        % findjobj not avaiable so resort to default behaviour
+        obj_fail = 1;
     end
     
-catch
-    return
+    func_handles=Set_Current_Data(handles);
+    handles=func_handles;
+    guidata(hObject, handles);
+    
+    % Restore the table position
+    if obj_fail == 0
+        drawnow()
+        viewport.setViewPosition(P);
+    end
+    
 end
 
 
@@ -2023,4 +2029,3 @@ function EM_Axes_ButtonDownFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 PopOutFigure(handles.EM_Axes, 'End Members')
-
