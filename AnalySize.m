@@ -64,7 +64,7 @@ handles.output = hObject;
 Ver = ver('MATLAB');
 handles.Version = str2double(Ver.Version);
 
-handles.AnalySize_Version = '1.2.0';
+handles.AnalySize_Version = '1.2.1';
 handles.AnalySize_Date = 'July 2020';
 
 handles.Curent_Pos = get(handles.AnalySize_MW, 'Position');
