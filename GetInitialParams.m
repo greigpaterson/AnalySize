@@ -77,7 +77,7 @@ end
 warning('off', 'MATLAB:rankDeficientMatrix');
 
 % Set options for the search
-options=optimset('MaxIter', 1e3, 'MaxFun', 1e3, 'TolX', 1e-3, 'TolFun', 1e-3, 'Display', 'off');
+options=optimset('MaxIter', 1e3, 'MaxFun', 1e3, 'TolX', 1e-4, 'TolFun', 1e-4, 'Display', 'off');
 
 % for storing the parameters
 Initial=cell(kmax, 1); 
@@ -89,6 +89,9 @@ for ii = kmin:kmax
     
     % Get the HALS-NMF solution
     [tmp_EM, tmp_Abunds] = HALS_NMF(X, ii, 5e3, 10);
+    
+        % Check convexity and adjust b2 if needed
+    [tmp_EM, tmp_Abunds, Xprime, Convexity] = Find_b2(X, tmp_EM);
     
     % Sort the EMs by their mean abundances
     [sorted_abunds, Sinds] = sortrows(mean(tmp_Abunds)', -1);

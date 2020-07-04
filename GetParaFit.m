@@ -85,8 +85,6 @@ if Flag == 0
     fval=NaN(EM_Max,1);
     EF=NaN(EM_Max,1);
     
-%     tic
-    
     % Set up a waitbar to count the loop
     h = waitbar(0,'Initializing....', 'Name', 'Calculating end member fits...',...
         'CreateCancelBtn', 'setappdata(gcbf,''Cancelled'',1)');
@@ -95,8 +93,6 @@ if Flag == 0
 
     [Lower, Upper, Initial_Params] = GetInitialParams(X, GS, EM_Min, EM_Max, Fit_Type);
 
-    %     toc
-
     %% The main loop
     
     % suppress rank deficient warnings. This is often needed for high numbers
@@ -104,8 +100,8 @@ if Flag == 0
     warning('off', 'MATLAB:rankDeficientMatrix');
     
     % Set options for the search
-    options=optimset('MaxIter', 1e4, 'MaxFun', 1e4, 'TolX', 1e-4, 'TolFun', 1e-4, 'Display', 'off');
-%     options=optimset('MaxIter', 1e4, 'MaxFun', 1e4, 'TolX', 1e-8, 'TolFun', 1e-8, 'Display', 'off');
+    %options=optimset('MaxIter', 1e4, 'MaxFun', 1e4, 'TolX', 1e-4,'TolFun', 1e-4, 'Display', 'off'); % for testing
+    options=optimset('MaxIter', 1e4, 'MaxFun', 1e4, 'TolX', 1e-6, 'TolFun', 1e-6, 'Display', 'off');
     
     % Check for Cancel button press
     if getappdata(h,'Cancelled')
@@ -167,7 +163,6 @@ if Flag == 0
     warning('on', 'MATLAB:rankDeficientMatrix');
     
     delete(h) % delete the waitbar
-%     toc
     
     if Cancel_Flag == 1
         % User has cancelled so return emptiness
