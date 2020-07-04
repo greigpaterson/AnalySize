@@ -64,8 +64,8 @@ handles.output = hObject;
 Ver = ver('MATLAB');
 handles.Version = str2double(Ver.Version);
 
-handles.AnalySize_Version = '1.1.3';
-handles.AnalySize_Date = 'December 2019';
+handles.AnalySize_Version = '1.2.0';
+handles.AnalySize_Date = 'July 2020';
 
 handles.Curent_Pos = get(handles.AnalySize_MW, 'Position');
 
@@ -1878,6 +1878,25 @@ catch
     warndlg([file_name, ' not found.'], 'Manual Not Found');
 end
 
+% --------------------------------------------------------------------
+function MB_Open_Paper_Callback(hObject, eventdata, handles)
+% hObject    handle to MB_Open_Paper (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get the current path of the main m-file
+S = mfilename('fullpath');
+name_len = length(mfilename());
+MyPath = S(1:end-name_len);
+
+file_name = 'Paterson & Heslop, 2015, New methods for unmixing sediment grain size data.pdf';
+file_path = strcat(MyPath, 'Documents/', file_name);
+
+try
+    open(file_path);
+catch
+    warndlg([file_name, ' not found.'], 'Paper Not Found');
+end
 
 % --------------------------------------------------------------------
 function MB_About_AnalySize_Callback(hObject, eventdata, handles)
