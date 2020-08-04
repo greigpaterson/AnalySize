@@ -14,21 +14,21 @@ We recommend using GitHub Desktop (https://desktop.github.com/), which allows us
 If users are interesting in receiving email updates about AnalySize, please send an email to let us know (address given below).
 
 ## Authors
-Greig A. Paterson (greig.paterson "at" mail.iggcas.ac.cn)
-Institute of Geology & Geophysics, Chinese Academy of Science, Beijing, China.
+Greig A. Paterson (greig.paterson "at" liverpool.ac.uk)
+University of Liverpool, UK.
 
 David Heslop
 Australian National University, Canberra, Australia.
 
 
 
-## Brief Version History:
-(See the instruction manual for full details)
+<!--## Brief Version History:-->
+<!--(See the instruction manual for full details)-->
 
-|	Version 	|	Comment	|
-|:-------------:|:--------- |
-| 0.9.0-r  | Initial version submitted during publication review |
-| 1.0.0   | The first official release coinciding with the G-Cubed publication |
-| 1.0.1   | Various minor bug fixes |
-| 1.0.2   | Improved backward compatibility with MATLAB plus bug fixes |
-| 1.1.0   | Improved graphics customization options plus minor bug fixes |
+<!--|	Version 	|	Comment	|-->
+<!--|:-------------:|:--------- |-->
+<!--| 0.9.0-r  | Initial version submitted during publication review |-->
+<!--| 1.0.0   | The first official release coinciding with the G-Cubed publication |-->
+<!--| 1.0.1   | Various minor bug fixes |-->
+<!--| 1.0.2   | Improved backward compatibility with MATLAB plus bug fixes |-->
+<!--| 1.1.0   | Improved graphics customization options plus minor bug fixes |-->
