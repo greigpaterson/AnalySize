@@ -340,11 +340,14 @@ end
 
 % Set the default color order for the PDF plot
 % Do a MATLAB version check
-if handles.Version <= 8.3 % 2014a and before
+if handles.Version <= 8.3
+    % 2014a and before
     set(handles.PDF_Axes, 'ColorOrder',handles.Default_Plot_Colors);
+    handles.PDF_Axes.ColorOrderIndex = 1;
 else
     % add black to top for the total PDF fit
     set(handles.PDF_Axes, 'ColorOrder', [[0 0 0]; handles.Default_Plot_Colors]);
+    handles.PDF_Axes.ColorOrderIndex = 1;
 end
 
 if Plot_Fits==1
@@ -354,7 +357,7 @@ if Plot_Fits==1
     EM_Fits = handles.Current_Specimen_Fit;%repmat(handles.Current_Fit_Abunds(handles.spec_ind,:), handles.nVar, 1)'.*handles.Current_Fit_EMs;
     
     hold(handles.PDF_Axes, 'on')
-    plot(handles.PDF_Axes, Xplot, 100.*PDF_Fits, '-k', 'LineWidth', 2)
+    plot(handles.PDF_Axes, Xplot, 100.*PDF_Fits, 'LineWidth', 2)
     plot(handles.PDF_Axes, Xplot, 100.*EM_Fits, 'LineWidth', 1)
     hold(handles.PDF_Axes, 'off')
     
@@ -362,7 +365,7 @@ if Plot_Fits==1
     tmp_theta = handles.Specimen_QFit(handles.spec_ind,2);
     
     % Check the specimen name and format correctly
-    if isnumeric(handles.All_Names{handles.spec_ind});
+    if isnumeric(handles.All_Names{handles.spec_ind})
         MSG = [sprintf('%g', handles.All_Names{handles.spec_ind}), '; R^2 = ', sprintf('%2.3f', tmp_r2), ', Theta = ', sprintf('%2.3f', tmp_theta)];
     elseif ischar(handles.All_Names{handles.spec_ind})
         MSG = [handles.All_Names{handles.spec_ind}, '; R^2 = ', sprintf('%2.3f', tmp_r2), ', Theta = ', sprintf('%2.3f', tmp_theta)];
