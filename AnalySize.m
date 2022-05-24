@@ -1270,8 +1270,12 @@ else
         
         % The format string for printing the data
         fmt = '%s\t%2.5f\t%2.5f';
-        Data_Out = [handles.All_Names, num2cell(handles.Specimen_QFit)];
-        
+
+        % Convert numeric names to strings for output
+        Out_Names = handles.All_Names;
+        Out_Names(cellfun(@isnumeric, handles.All_Names)) = cellfun(@num2str, handles.All_Names(cellfun(@isnumeric, handles.All_Names)), 'UniformOutput', false);
+        Data_Out = [Out_Names, num2cell(handles.Specimen_QFit)];
+
         fprintf(A_out_file, '%s\t%s\t%s', 'Specimen', 'R^2', 'Theta');
         
         nFits = handles.nEnd;
@@ -1341,7 +1345,12 @@ catch
     return;
 end
 
-[file,path] = uiputfile(strcat(handles.All_Names{handles.spec_ind}, '_Data.dat'),'Save the plot data...');
+Out_Name = handles.All_Names{handles.spec_ind};
+if isnumeric(Out_Name)
+    Out_Name = num2str(Out_Name);
+end
+
+[file,path] = uiputfile(strcat(Out_Name, '_Data.dat'),'Save the plot data...');
 
 
 if ~ischar(file) && file==0
@@ -1395,7 +1404,12 @@ function Export_All_Data_Callback(hObject, eventdata, handles)
 
 try
     Data = [handles.All_GS{1}, 100.*cell2mat(handles.All_Data)'];
-    Header = [{'Grain Size'}, handles.All_Names'];
+
+    % Convert numeric names to strings for output
+    Out_Names = handles.All_Names;
+    Out_Names(cellfun(@isnumeric, handles.All_Names)) = cellfun(@num2str, handles.All_Names(cellfun(@isnumeric, handles.All_Names)), 'UniformOutput', false);
+
+    Header = [{'Grain Size'}, Out_Names'];
 catch
     warndlg('No data currently loaded.', 'No Data', 'modal')
     return;
