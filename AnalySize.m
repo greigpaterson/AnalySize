@@ -1124,7 +1124,7 @@ else
     
     % Reset the line widths
     C = get(newAxes, 'Children');
-    for ii = 1: length(C);
+    for ii = 1: length(C)
         set(C(ii),'LineWidth',1);
     end
     

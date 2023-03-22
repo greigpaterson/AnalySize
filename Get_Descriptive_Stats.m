@@ -11,6 +11,8 @@ function Stats = Get_Descriptive_Stats(X, GS, Type_Flag)
 %                    3) Geometic graphic
 %                    4) Log graphic
 %                    5) Percentiles
+%                    6) Size fractions
+%                    7) Sortable silt
 %
 % Output:
 %        Stats - nData x 4 matrix [Mean, StDev, Skewness, Kurtosis]
@@ -111,6 +113,23 @@ switch Type_Flag
         gravel_pct(gravel_pct<1e-6) = 0; % remove rounding errors
         
         Stats = [clay_pct, silt_pct, sand_pct, gravel_pct].*100;
+        
+    case 7 % Sortable silt
+        
+        % Get the indices of soratble silt fraction
+        GS_idx = GS(1,:)>=10 & GS(1,:)<=63;
+
+        % Get the geometric and log moment means
+        GSbar_GM = exp(sum(X(:,GS_idx).*log(GS(:,GS_idx)), 2));
+        GSbar_LM =sum(X(:,GS_idx).*Phi(:,GS_idx), 2);
+        
+        % The data cumulative sum
+        CS = cumsum(X,2);
+        
+        % The precentage
+        sortable_pct = 100.*(interp1(GS(1,:), CS', 63)' - interp1(GS(1,:), CS', 10)');
+       
+        Stats = [GSbar_GM, GSbar_LM, sortable_pct];
                        
     otherwise
         error('Get_Descriptive_Stats:Type_Flag', 'Unrecognized statistics flag requested.');
